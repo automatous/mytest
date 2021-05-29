@@ -100,6 +100,7 @@ public class Global8LocalVariableTest {
             System.out.println();
         }
     }
+
     // ===================================================
 
     @Test
