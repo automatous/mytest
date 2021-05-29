@@ -85,6 +85,7 @@ public class Global8LocalVariableTest {
             }
             System.out.println();
         }
+
         System.out.println("sum = " + sum);
     }
 
