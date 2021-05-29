@@ -101,6 +101,7 @@ public class Global8LocalVariableTest {
         }
     }
 
+
     // ===================================================
 
     @Test
