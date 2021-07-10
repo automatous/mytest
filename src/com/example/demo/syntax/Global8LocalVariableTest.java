@@ -1,6 +1,6 @@
 package com.example.demo.syntax;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class Global8LocalVariableTest {
 
@@ -22,6 +22,27 @@ public class Global8LocalVariableTest {
         System.out.println(x);
     }
 
+    // ===================================================
+
+    @Test
+    public void testFactorial() {
+        int n = 40;
+        int answer = factorial(n);
+        System.out.println(answer);
+        for (int i = 0; i < 100; i++) {
+            answer = factorial(i);
+            // 15之后就溢出了!
+            System.out.println("i = " + i + ", " + answer);
+        }
+    }
+
+    public static int factorial(int n) {
+        int ret = 1;
+        for (int i = 1; i <= n; i++) {
+            ret *= i;
+        }
+        return ret;
+    }
     // ===================================================
 
     @Test
@@ -69,6 +90,27 @@ public class Global8LocalVariableTest {
             sum += 4.0 / divisor;
         }
         return sum;
+    }
+
+    @Test
+    public void testPi() {
+        for (int i = 10; i > 0; i *= 10) {
+            double pi = pi(i);
+            System.out.println(pi);
+        }
+    }
+
+    public static double pi(int numOfTerms) {
+        int count;
+        double pi = 0;
+        for (count = 1; count <= numOfTerms; count++) {
+            if (count % 2 != 0) {
+                pi = pi + (4.0 / (2 * count - 1));
+            } else {
+                pi = pi - (4.0 / (2 * count - 1));
+            }
+        }
+        return pi;
     }
     // ===================================================
 

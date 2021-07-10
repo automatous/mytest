@@ -1,5 +1,7 @@
 package com.example.demo.alg;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * https://blog.csdn.net/weixin_43128682/article/details/102770679?utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.vipsorttest&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.vipsorttest
  */
@@ -124,5 +126,31 @@ public class FloatTest {
         System.out.println("1-0.9f="+(1-0.9f));
         System.out.println("1f的16进制存储值为："+Integer.toHexString(Float.floatToIntBits(1f)));
         System.out.println("-0.9f的16进制存储值为："+Integer.toHexString(Float.floatToIntBits(-0.9f)));
+    }
+
+
+    @Test
+    public void test02() {
+        int n = 10;
+        double[] a;
+        a = new double[n];
+        for (double v : a) {
+            System.out.println(v);
+        }
+    }
+
+
+    @Test
+    public void test01() {
+        double d = (int) 11.99 * 0.25;
+        System.out.println(d);
+    }
+
+    @Test
+    public void test00() {
+        double a = 3.141;
+        double b = 2.0;
+        double c = a - b;
+        System.out.println(c);
     }
 }
