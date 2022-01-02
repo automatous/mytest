@@ -1,7 +1,8 @@
-package com.example.demo.approach;
+package com.example.demo.approach.chapter1_2;
 
 import com.example.demo.stdio.StdIn;
 import com.example.demo.stdio.StdOut;
+import org.junit.jupiter.api.Test;
 
 public class StdInTest {
     public static void main(String[] args) {
