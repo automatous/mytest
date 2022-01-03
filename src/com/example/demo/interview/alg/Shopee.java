@@ -2,12 +2,519 @@ package com.example.demo.interview.alg;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class Shopee {
+
+
+    /**
+     * 前25题
+     */
+
+    /**
+     * 1、2略，hard
+     */
+
+    /**
+     * 3.使用2个栈实现一个队列
+     * 核心思路：栈是FILO，将一个栈里面所有的数据往另一个栈放就可以达成FIFO
+     * 存数据只需放入inStack，取从outStack取，如果是空的则将inStack所有数据加入outStack
+     */
+    class MyQueue {
+        Deque<Integer> inStack;
+        Deque<Integer> outStack;
+
+        public MyQueue() {
+            inStack = new LinkedList<>();
+            outStack = new LinkedList<>();
+        }
+
+        public void push(int x) {
+            inStack.push(x);
+        }
+
+        public int pop() {
+            if (outStack.isEmpty()) {
+                in2out();
+            }
+            return outStack.pop();
+        }
+
+        public int peek() {
+            if (outStack.isEmpty()) {
+                in2out();
+            }
+            return outStack.peek();
+        }
+
+        public boolean empty() {
+            return inStack.isEmpty() && outStack.isEmpty();
+        }
+
+        private void in2out() {
+            while (!inStack.isEmpty()) {
+                outStack.push(inStack.pop());
+            }
+        }
+    }
+
+    /**
+     * 4.重新排列句子中的单词
+     * 核心思路：使用map。根据空格拆分，以拆分后字符串长度和字符串本身做k-v，再排序key，拼接
+     */
+    public String arrangeWords(String text) {
+        StringBuilder sb = new StringBuilder();
+        Map<Integer, String> map = new HashMap<>();
+        // 字母转换为小写
+        text = text.toLowerCase();
+        //添加到map中
+        String[] texts = text.split(" ");
+        for (String s : texts) {
+            map.put(s.length(), map.getOrDefault(s.length(), "") + s + " ");
+        }
+        //遍历键
+        int[] keys = new int[map.size()];
+        int idx = 0;
+        for (Integer key : map.keySet()) {
+            keys[idx++] = key;
+        }
+        Arrays.sort(keys);
+        for (int key : keys) {
+            sb.append(map.get(key));
+        }
+        // 首字母转换为大写
+        String res = sb.toString();
+        res = res.substring(0, 1).toUpperCase() + res.substring(1, res.length() - 1);
+        return res;
+    }
+
+    /**
+     * 5.最长不含重复字符的子字符串长度
+     * 核心思路：滑动窗口。map (k, v)，其中 key 值为字符，value 值为字符位置
+     */
+    public int lengthOfLongestSubstring(String s) {
+        if (s == null || s.length() == 0) return 0;
+        int max = 0, length = s.length(), start = 0;
+        Map<Character, Integer> map = new HashMap<>();
+        for (int end = 0; end < length; end++) {
+            char charAt = s.charAt(end);
+            if (map.containsKey(charAt)) {
+                start = Math.max(map.get(charAt) + 1, start);
+            }
+            max = Math.max(max, end - start + 1);
+            map.put(charAt, end);
+
+        }
+        return max;
+    }
+
+
+    /**
+     * 6.反转单链表。1,2,3,4,5——>5,4,3,2,1
+     * 核心思路：当前下一个指向前面指针，然后前指针和当前指针都后移
+     */
+    public static ListNode reverseListNode(ListNode head) {
+        ListNode prev = null; //前指针节点
+        ListNode curr = head; //当前指针节点
+        //每次循环，都将当前节点指向它前面的节点，然后当前节点和前节点后移
+        while (curr != null) {
+            ListNode nextTemp = curr.next; //临时节点，暂存当前节点的下一节点，用于后移
+            curr.next = prev; //将当前节点指向它前面的节点
+            prev = curr; //前指针后移
+            curr = nextTemp; //当前指针后移
+        }
+        return prev;
+    }
+
+    /**
+     * 7.三数之和。给你一个包含 n 个整数的数组nums，判断nums中是否存在三个元素 a，b，c ，使得a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。
+     * 注意：答案中不可以包含重复的三元组。
+     * 核心思路：排序+双指针
+     */
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> lists = new ArrayList<>();
+        // 排序
+        Arrays.sort(nums);
+        // 双指针
+        int len = nums.length;
+        for (int i = 0; i < len; ++i) {
+            if (nums[i] > 0)
+                return lists;
+
+            if (i > 0 && nums[i] == nums[i - 1])
+                continue;
+
+            int curr = nums[i];
+            int L = i + 1, R = len - 1;
+            while (L < R) {
+                int tmp = curr + nums[L] + nums[R];
+                if (tmp == 0) {
+                    List<Integer> list = new ArrayList<>();
+                    list.add(curr);
+                    list.add(nums[L]);
+                    list.add(nums[R]);
+                    lists.add(list);
+                    while (L < R && nums[L + 1] == nums[L])
+                        ++L;
+                    while (L < R && nums[R - 1] == nums[R])
+                        --R;
+                    ++L;
+                    --R;
+                } else if (tmp < 0) {
+                    ++L;
+                } else {
+                    --R;
+                }
+            }
+        }
+        return lists;
+    }
+
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+
+        TreeNode(int x) {
+            val = x;
+        }
+    }
+
+    /**
+     * 8.查找二叉树中两个指定节点的最近公共祖先
+     * 核心思路：利用二叉树性质。当前节点比两个都大的时候，说明两个节点都在当前左侧，就将当前节点左移。如果都小则右移。否则即左右分布或是父子
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode ancestor = root;
+        while (true) {
+            if (p.val < ancestor.val && q.val < ancestor.val) {
+                ancestor = ancestor.left;
+            } else if (p.val > ancestor.val && q.val > ancestor.val) {
+                ancestor = ancestor.right;
+            } else {
+                break;
+            }
+        }
+        return ancestor;
+    }
+
+    /**
+     * 9.设计一个LRU缓存。  LRU (最近最少使用)缓存
+     * 核心思路：使用LinkedHashMap。主要涉及到get和put，分key存在和不存在两种情况
+     */
+    class LRUCache {
+        Map<Integer, Integer> map;
+        final int size;
+
+        public LRUCache(int capacity) {
+            map = new LinkedHashMap<>(capacity);
+            size = capacity;
+        }
+
+        // 判断key是否存在，不存在返回-1，存在删除旧的添加新的
+        public int get(int key) {
+            Integer val = map.get(key);
+            if (val != null) {
+                // 最近用到了，把旧的移除，添加新的到最后
+                map.remove(key);
+                map.put(key, val);
+                return val;
+            }
+            return -1;
+        }
+
+        public void put(int key, int value) {
+            if (map.containsKey(key)) {
+                map.remove(key);
+            } else {
+                if (size == map.size()) {
+                    Iterator<Map.Entry<Integer, Integer>> iterator = map.entrySet().iterator();
+                    iterator.next();
+                    iterator.remove();
+                }
+            }
+
+            map.put(key, value);
+
+        }
+    }
+
+    /**
+     * 10.采用非递归的方式实现二叉树的前序遍历
+     * 核心思路：本质上还是模拟递归，递归过程中使用了栈，所以可以用栈来实现
+     */
+    public void preorderTraversal(TreeNode head) {
+        if (head == null) {
+            return;
+        }
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(head);
+        while (!stack.isEmpty()) {
+            TreeNode node = stack.pop();
+            System.out.print(node.val + " ");
+            if (node.right != null) {
+                stack.push(node.right);
+            }
+            if (node.left != null) {
+                stack.push(node.left);
+            }
+        }
+    }
+
+    /**
+     * 11.写一个冒泡排序
+     */
+    public void bubbleSort(int[] arr) {
+        if (arr == null || arr.length < 2) {
+            return;
+        }
+        for (int i = 0; i < arr.length - 1; i++) {
+            for (int j = 0; j < arr.length - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    /**
+     * 12.判断链表中是否有环
+     * 核心思路：快慢指针
+     */
+    public boolean hasCycle(ListNode head) {
+        if (head == null) return false;
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            if (fast == slow) return true;
+        }
+        return false;
+    }
+
+    /**
+     * 13.将一个整数反转
+     * 核心思路：循环除10，用result乘10+x的取余
+     */
+    public int reverse(int x) {
+        int result = 0;
+        while (x != 0) {
+            int tmp = result; // 保存计算之前的结果
+            result = (result * 10) + (x % 10);
+            x /= 10;
+            // 将计算之后的结果 / 10，判断是否与计算之前相同，如果不同，证明发生溢出，返回0
+            if (result / 10 != tmp) return 0;
+        }
+        return result;
+    }
+
+    /**
+     * 14.实现二叉树后序遍历
+     * 核心思路：栈
+     */
+    public List<Integer> postOrder(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> list = new ArrayList<>();
+        TreeNode cur = root;
+        TreeNode p = null;//用来记录上一节点
+        while (!stack.isEmpty() || cur != null) {
+            while (cur != null) {
+                stack.push(cur);
+                cur = cur.left;
+            }
+            cur = stack.peek();
+//            后序遍历的过程中在遍历完左子树跟右子树cur都会回到根结点。所以当前不管是从左子树还是右子树回到根结点都不应该再操作了，应该退回上层。
+//            如果是从右边再返回根结点，应该回到上层。
+            //主要就是判断出来的是不是右子树，是的话就可以把根节点=加入到list了
+            if (cur.right == null || cur.right == p) {
+                list.add(cur.val);
+                stack.pop();
+                p = cur;
+                cur = null;
+            } else {
+                cur = cur.right;
+            }
+
+        }
+        return list;
+    }
+
+    /**
+     * 15.用最熟悉的语言实现一个快速排序算法
+     */
+    void quicksort(int n[], int left, int right) {
+        int dp;
+        if (left < right) {
+            dp = partition(n, left, right);
+            quicksort(n, left, dp - 1);
+            quicksort(n, dp + 1, right);
+        }
+    }
+
+    int partition(int n[], int left, int right) {
+        int pivot = n[left];
+        while (left < right) {
+            while (left < right && n[right] >= pivot)
+                right--;
+            if (left < right)
+                n[left++] = n[right];
+            while (left < right && n[left] <= pivot)
+                left++;
+            if (left < right)
+                n[right--] = n[left];
+        }
+        n[left] = pivot;
+        return left;
+    }
+
+    /**
+     * 16.求最长回文子串
+     * 核心：DP动态规划
+     */
+    public String longestPalindrome(String s) {
+        if (s == null || s.length() < 2) {
+            return s;
+        }
+        int length = s.length();
+        int maxStart = 0, maxEnd = 0, maxLength = 1;
+        boolean[][] dp = new boolean[length][length];
+        for (int r = 1; r < length; r++) {
+            for (int l = 0; l < r; l++) {
+                if (s.charAt(l) == s.charAt(r) && (r - l <= 2 || dp[l + 1][r - 1])) {
+                    dp[l][r] = true;
+                    if (r - l + 1 > maxLength) {
+                        maxLength = r - l + 1;
+                        maxStart = l;
+                        maxEnd = r;
+
+                    }
+                }
+            }
+        }
+        return s.substring(maxStart, maxEnd + 1);
+    }
+
+    /**
+     * 17.设计个支持push，pop，top操作，并能在常数时间内检索到最小元素的栈
+     * 核心思路：每次入栈2个元素，一个是入栈的元素本身，一个是当前栈元素的最小值。以空间换时间
+     */
+    class MinStack {
+        /** initialize your data structure here. */
+        Stack<Integer> stack;
+        Stack<Integer> minStack;
+
+        public MinStack() {
+            stack = new Stack<>();
+            minStack = new Stack<>();
+            minStack.add(Integer.MAX_VALUE);
+        }
+
+        public void push(int x) {
+            stack.push(x);
+            minStack.push(Math.min(x, minStack.peek()));
+        }
+
+        public void pop() {
+            stack.pop();
+            minStack.pop();
+        }
+
+        public int top() {
+            return stack.peek();
+        }
+
+        public int getMin() {
+            return minStack.peek();
+        }
+    }
+
+    /**
+     * 18题不明确
+     */
+
+    /**
+     * 19.数组中重复的数字
+     * 核心思路：Set或Map判断是否存在
+     */
+    public int findRepeatNumber(int[] nums) {
+        Set<Integer> dic = new HashSet<>();
+        for(int num : nums) {
+            if(dic.contains(num)) return num;
+            dic.add(num);
+        }
+        return -1;
+    }
+
+    /**
+     * 20题同题9
+     */
+
+    /**
+     * 21.数组中的最长连续子序列。给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度
+     * 输入：nums = [100,4,200,1,3,2]
+     * 输出：4
+     * 解释：最长数字连续序列是 [1, 2, 3, 4]。它的长度为 4。
+     */
+    public int longestConsecutive(int[] nums) {
+        Set<Integer> set = new HashSet<>();
+        for (int i : nums) {
+            set.add(i);
+        }
+        int res = 0;
+        for (int num : nums) {
+            if (set.remove(num)) {
+                int curLen = 1;
+                int curNum = num;
+                while (set.remove(curNum - 1)) { // 100往左查，99,98到没有为止
+                    curNum--;
+                }
+                curLen += num - curNum; // 4会减到1，num-curNum=4-1，再加上初始值1
+                curNum = num; // 重置为100
+                while (set.remove(curNum + 1)) { // 100往右，101,102...
+                    curNum++;
+                }
+                curLen += curNum - num; // 如果有5,6，curNum会增加到6，然后累加上左边的数可达到6
+                res = Math.max(res, curLen);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 22.求两个字符串的编辑距离 略 hard
+     */
+
+    /**
+     * 23.以K个位一组翻转链表 略 hard
+     */
+
+    /**
+     * 24.有效的括号
+     * 核心思路：栈
+     */
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<>();
+        for (char c : s.toCharArray()) {
+            if(c=='(') {
+                stack.push(')');
+            }else if(c=='[') {
+                stack.push(']');
+            } else if(c=='{') {
+                stack.push('}');
+            } else if (stack.isEmpty() || c!= stack.pop()){
+                return false;
+            }
+        }
+        return stack.isEmpty();
+    }
+
+
+
+    // ======================================================================================
+
     /**
      * 26. 一个人每次只能走1层或者2层楼梯, 问走到第80层一共有多少种走法?
      */
@@ -348,12 +855,12 @@ public class Shopee {
         }
     }
 
-    static class Deque<K, V> {
+    static class MyDeque<K, V> {
         Node<K, V> head;
         Node<K, V> tail;
         int size;
 
-        public Deque() {
+        public MyDeque() {
         }
 
         public void addNode2Tail(Node<K, V> node) {
@@ -410,14 +917,14 @@ public class Shopee {
     }
 
     static class MyCache<K, V> {
-        private final Deque<K, V> deque;
+        private final MyDeque<K, V> deque;
         private final int capacity;
 
         public MyCache(int capacity) {
             if (capacity < 1) {
                 throw new RuntimeException("should be more than 0.");
             }
-            this.deque = new Deque<>();
+            this.deque = new MyDeque<>();
             this.capacity = capacity;
         }
 
