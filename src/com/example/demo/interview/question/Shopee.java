@@ -361,6 +361,481 @@ P311~317    1. 开源项目? 剑指offer 刷起来/leetCode 有时间看看/牛�
 
     // ===================================================================================================================================
 
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MySQL ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /*
+    ### MySQL
+
+
+
+**ACID的实现机制是什么？**
+
+- 原子性（Atomicity）：事务内SQL要么同时成功要么同时失败 ，基于UndoLog实现。
+
+- 一致性（Consistency）：系统从一个正确态转移到另一个正确态，由应用通过AID来保证，并非数据库的责任。
+
+- 隔离性（Isolation）：控制事务并发执行时数据的可见性，基于锁和MVCC实现。
+
+- 持久性（Durability）：提交后一定存储成功不会丢失，基于RedoLog实现。
+
+
+
+> 回表
+
+MySQL的数据存储在叶子节点，当查询非主键索引时，需要根据索引找到主键ID所在的位置，去主键索引查询获取数据记录，这个过程叫做回表。
+
+> 索引下推Index Condition Pushdown
+
+MySQL5.6版本开始引进的优化技术：在使用了组合索引的情况下，直接在匹配索引的同时剔除不符合范围条件的记录。减少回表的次数和加载的数据量，来达到查询优化的目的。
+
+- For `InnoDB` tables, ICP is used only for secondary indexes. The goal of ICP is to reduce the number of full-row reads and thereby reduce I/O operations. For `InnoDB` clustered indexes, the complete record is already read into the `InnoDB` buffer. Using ICP in this case does not reduce I/O.
+
+- Conditions that refer to subqueries cannot be pushed down.
+
+- Conditions that refer to stored functions cannot be pushed down. Storage engines cannot invoke stored functions.
+- Triggered conditions cannot be pushed down.
+
+> 索引覆盖
+
+当查询的字段全都在索引上可以返回时的情况叫做索引覆盖
+
+> B+树
+
+mysql的底层索引使用的是B+树的结构，是在 B树 基础上的一种优化。
+
+B+树在 B 树的基础上，做了一些改进：
+
+  1）非叶子节点不再存储数据，数据只存储在同一层的叶子节点上；
+
+  2）叶子之间，增加了链表，获取所有节点，不再需要中序遍历；
+
+范围查询在 SQL 中用得很多，这是 B+树比 B 树最大的优势。![img](https://wework.qpic.cn/wwpic/451824_9B6Po2GrQQ2M0dq_1634010392/0?tp=webp)
+
+
+
+通常在 B+Tree 上有两个头指针，一个指向根节点，另一个指向关键字最小的叶子节点，而且所有叶子节点之间是一种链式环结构。 因此可以对 B+Tree 进行两种查找运算：一种是对于主键的范围查找和分页查找，另一种是从根节点开始，进行随机查找。
+
+
+
+**事务隔离级别**
+
+* 读未提交
+* 读已提交
+* 不可重复读
+* 串行化
+
+当前 MySQL 默认情况下使用RR的隔离级别，而NEXT-KEY LOCK正是为了解决RR隔离级别下的幻读问题
+
+
+
+**数据库存储引擎InnoDB和MyISAM区别**
+
+* InnoDB 支持事务，MyISAM 不支持事务
+
+* InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁
+
+* InnoDB 支持外键，而 MyISAM 不支持
+
+* InnoDB 是聚集索引，MyISAM 是非聚集索引。聚簇索引的文件存放在主键索引的叶子节点上，因此 InnoDB 必须要有主键，通过主键索引效率很高。但是辅助索引需要两次查询，先查询到主键，然后再通过主键查询到数据。因此，主键不应该过大，因为主键太大，其他索引也都会很大。而 MyISAM 是非聚集索引，数据文件是分离的，索引保存的是数据文件的指针。主键索引和辅助索引是独立的。
+
+
+
+**Redo log、Undo log、binlog**
+
+由于传统磁盘顺序访问性能远好于随机访问，采用Logging的故障恢复机制意图利用顺序写的Log来记录对数据库的操作，并在故障恢复后通过Log内容将数据库恢复到正确的状态。简单的说，每次修改数据内容前先顺序写对应的Log，同时为了保证恢复时可以从Log中看到最新的数据库状态，要求Log先于数据内容落盘，也就是常说的**Write Ahead Log(WAL)**。除此之外，事务完成Commit前还需要在Log中记录对应的Commit标记，以供恢复时了解当前的事务状态，因此还需要关注Commit标记和事务中数据内容的落盘顺序。根据Log中记录的内容可以分为三类：Undo-Only，Redo-Only，Redo-Undo。
+
+
+
+**索引优化技术**
+
+1. **适度冗余, 减少频繁查询的join操作**
+
+join操作本身就比较耗时,而且mysql对于复杂的join操作容易出现不合理的执行计划,因此对于更新不频繁但是查询频繁的其他表中的数据可以适当冗余存储在查询主表中。
+
+2. **大表分拆**
+
+当一个表的记录数超过1000万时就要考虑分拆或数据迁移了, 一个大表往往很容易造成性能瓶颈，几个效率低下的sql并发就可以把数据库拖垮。并且大表后期维护比较麻烦，后续对表的变更将会变得非常不易，使用pt工具不锁表变更，需要对原表数据进行完全拷贝，会产生比较多的binlog，会造成主从延迟和依赖binlog同步的应用延迟影响。
+
+3. **选择合适的主键**
+
+表一定要有主键，不管是使用数据库自带的自增主键或是自定义生成的主键，并且类型最好是整型，无业务意义的，并且不要使用多个字段组成的复合主键。一方面是方便后期维护简单，很多工具依赖此，包括我们生产表变更工具pt，没有的话将无法运行，就只能直接执行，带来的影响就是表级锁，增删改全部被阻塞，是不可接受的。另一方面，线上数据库binlog格式都是ROW，当没有主键的表做大事务更新时，从库的同步将会卡住相当长的一段时间，造成严重延迟。
+
+4. **选择合适的数据类型**
+
+数据库操作中最为耗时的操作就是 IO 处理，大部分数据库操作 90% 以上的时间都花在了 IO 读写上面。所以尽可能减少 IO 读写量，可以在很大程度上提高数据库操作的性能。
+
+1）数字类型：不要使用DOUBLE，不仅仅只是存储长度的问题，同时还会存在精确性的问题。
+
+2）字符类型：文本数据尽量用varchar存储。因为varchar是变长存储，并且要控制长度。
+
+3）BLOB/text类型：禁止在数据库中存放 BLOB /text类型数据，它们都比较浪费硬盘和内存空间。在加载表数据时，会读取大字段到内存里从而浪费内存空间，影响系统性能。
+
+4）时间类型：尽量使用TIMESTAMP类型，因为其存储空间只需要 DATETIME 类型的一半。对于只需要精确到某一天的数据类型，建议使用DATE类型，因为他的存储空间只需要3个字节，比TIMESTAMP还少。
+
+**不使用索引的情况**
+
+* 隐式类型转换：column的类型是char或者varchar，但是查询条件是数字。
+* like语句时%号开头
+* 不符合组合索引的最左匹配原则
+* or语句：or语句分割开的查询条件，如果有一个没有索引，那么会走全表扫描
+* MySQL查询优化器认为使用索引比全表扫描更慢时不使用索引
+* 避免对建有索引的字段进行运算或函数类操作，否则会导致索引无法使用到，例如a*3，func(a)等
+* where 条件中 not 和 <>、!= ，is null等操作无法使用索引
+* 多表关联时，要保证关联字段上一定有索引，并且关联的字段字符集要一样，否则使用不到索引。
+
+**简单查询优化**
+
+1. 使用筛选度高的字段作为索引
+2. 使用in查询时，控制in的数量在200以内
+3. join表时相关字段加索引并且要保持类型和字符编码一致
+4. 排序字段加索引
+5. 索引覆盖、索引下推技术
+
+
+
+> 主从同步
+
+
+
+> 数据库InnoDB锁
+
+InnoDB 支持多粒度锁定，允许行锁和表锁共存。
+
+`InnoDB` supports *multiple granularity locking* which permits coexistence of row locks and table locks. For example, a statement such as [`LOCK TABLES ... WRITE`](https://dev.mysql.com/doc/refman/8.0/en/lock-tables.html) takes an exclusive lock (an `X` lock) on the specified table. To make locking at multiple granularity levels practical, `InnoDB` uses [intention locks](https://dev.mysql.com/doc/refman/8.0/en/glossary.html#glos_intention_lock). Intention locks are table-level locks that indicate which type of lock (shared or exclusive) a transaction requires later for a row in a table. There are two types of intention locks:
+
+- An [intention shared lock](https://dev.mysql.com/doc/refman/8.0/en/glossary.html#glos_intention_shared_lock) (`IS`) indicates that a transaction intends to set a *shared* lock on individual rows in a table.
+- An [intention exclusive lock](https://dev.mysql.com/doc/refman/8.0/en/glossary.html#glos_intention_exclusive_lock) (`IX`) indicates that a transaction intends to set an exclusive lock on individual rows in a table.
+
+For example, [`SELECT ... FOR SHARE`](https://dev.mysql.com/doc/refman/8.0/en/select.html) sets an `IS` lock, and [`SELECT ... FOR UPDATE`](https://dev.mysql.com/doc/refman/8.0/en/select.html) sets an `IX` lock.
+
+The intention locking protocol is as follows:
+
+- Before a transaction can acquire a shared lock on a row in a table, it must first acquire an `IS` lock or stronger on the table.
+- Before a transaction can acquire an exclusive lock on a row in a table, it must first acquire an `IX` lock on the table.
+
+InnoBD支持多粒度的锁，允许行锁和表锁共存，InnoDB通过意向锁来实现多粒度锁共存。
+
+* 意向共享锁标识着某个事务意图在表的各行设置一个共享锁。
+* 意向排他锁标识着某个事务意图在表的各行设置一个排它锁。
+
+例如： ```SELECT ... FOR SHARE```设置的是意向共享锁，```SELECT ... FOR UPDATE```设置的是意向排他锁
+
+意向锁的协议如下：
+
+* 在事务获取一行记录的共享锁之前必须获取到表的意向共享锁或者更强的锁
+* 在事务获取一行记录的排他锁之前必须获取到表的排他锁
+
+意向锁的目的是标识一个事务正在锁定某一行或者打算锁定某一行
+
+**意向锁**
+假设事务T1希望对整个数据库加排他锁，也就是对root节点加排他锁，那么锁管理器需要确认这个加锁请求能否成功。为此，锁管理器需要遍历整个树状层次结构的所有节点，如果所有节点都没持有锁，那么可以对root节点加排他锁，否则需要延迟或拒绝该加锁请求。遍历整个层级结构的所有节点去判断能够加锁成功，这种方式不符合了多粒度锁的初衷，因为检查所有节点是否加锁跟直接对所有节点加锁的代价可以认为是相同的(最起码是一个数量级的)。
+
+为了解决上述问题，引入了一种新的锁类型-意向锁。如果一个节点加了意向锁，则意味着要在其后代节点进行显式加锁。在一个节点显式加锁之前，该节点的全部祖先节点均加上了意向锁。因此，判定能够成功给一个节点加锁时不必搜索整棵树。给某个节点加锁的事务必须遍历从root节点到该节点的路径，并给路径上的各节点加上意向锁。
+
+意向锁相当于是一个提前的加锁声明。这样其他事务就可以根据节点上的意向锁类型来判断它的加锁请求能否成功。为了达到这个目的要求，对某个节点显式的加共享锁或排他锁之前，必须对root节点到该节点的路径上的其他节点加相应的意向锁。通过意向锁，事务可以在一个高的层次上去加共享锁或排他锁，而不需要去检查所有的后代节点的加锁情况。
+
+意向锁分为以下三类：
+
+共享型意向锁(IS): 将在后代节点上显示加共享锁。
+
+排他性意向锁(IX): 将在后代节点上显示加排他锁或共享锁。
+
+共享排他型意向锁(SIX)：当前节点被显示的加共享锁，并将在后代节点上加排他锁。
+
+ **行锁**
+
+行锁是指对索引记录的锁，InnoDB锁对行所有相关的索引进行锁定。
+
+```java
+CREATE TABLE `stu` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(255) NOT NULL,
+  `age` int NOT NULL DEFAULT '0',
+  `class_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_age` (`age`) USING BTREE,
+  KEY `idx_username` (`user_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4
+```
+
+```update stu set class_name='ABC' where age=1;```则会锁定age=1对应记录的ID索引、idx_age索引和idx_username索引
+
+> 数据库高可用
+
+
+     */
+
+    // ___________________________________________________ MySQL _____________________________________________________________
+
+
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ JAVA ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+    /*
+
+
+Eureka
+
+Feign
+
+Nacos
+
+HashMap
+
+ConcurrenHashMap
+
+AQS
+
+Redis
+
+分布式缓存
+
+Spring
+
+Kafka架构、优缺点
+
+RocketMQ架构、优缺点
+
+Zookeeper架构
+
+两阶段、三阶段提交协议；Paxos协议、Zab协议、Raft协议；
+
+分库分表、一致性哈希
+
+分布式事务
+
+Docker、K8S
+
+
+
+**Java异常**
+
+Java的异常体系分为**Error**和**Exception**。**Error**是程序无法处理的，一旦出现，程序会被迫终止；**Exception**不会导致程序终止，**Exception**分为运行时异常(**RuntimeException**)和检查异常(**CheckedException**)，运行时异常发生在程序运行过程中，检查异常发生在程序编译时期，检查异常是程序必须要进行处理的，不处理无法通过编译。常见的运行时异常有```ArrayIndexOutOfBoundsException```、```ArithmeticException```、```NullPointerException```、```NumberFormatException```、```ClassCastException```，常见的检查异常有``IOException``、``FileNotFoundException``、```ClassNotFoundException```、```InterruptedException```
+
+
+
+### JVM
+
+#### 类加载
+
+> Java有```Bootstrap ClassLoader```、```ExtClassLoader```、```AppClassLoader```。```Bootstrap ClassLoader```负责加载```JAVA_HOME/jre/lib```下的jar包的类；```ExtClassLoader```负责加载```JAVA_HOME/jre/ext```下的jar包类；AppClassLoader负责加载classpath下的类。
+
+
+
+> **双亲委派机制**
+
+每个CLassLoader都会有一个父类加载器，当类加载器加载类的时候，会先去查看父类（如果没有找到父类则会视```BootstrapClassLoader```为父类，```bootstrap class loader```是虚拟机层面的类加载器）加载器是否加载了该类，如果加载过了则直接返回，如果没有加载则会调用自身的findClass方法去查找该类。
+
+
+
+```java
+public abstract class ClassLoader {
+
+     private static native void registerNatives();
+     static {
+         registerNatives();
+     }
+
+     // The parent class loader for delegation
+     // Note: VM hardcoded the offset of this field, thus all new fields
+     // must be added *after* it.
+     private final ClassLoader parent;
+ }
+```
+
+ 自定义加载类需要调用defineClass方法去将类变成JVM管理的类对象，defineClass方法会调用preDefineClass方法，改方法会检测类的包名是否是```java.```开头，如果是则抛出```SecurityException```异常。
+
+ ```Java
+     private ProtectionDomain preDefineClass(String name, ProtectionDomain pd) {
+         if (!checkName(name)) {
+             throw new NoClassDefFoundError("IllegalName: " + name);
+         }
+
+         // Note:  Checking logic in java.lang.invoke.MemberName.checkForTypeAlias
+         // relies on the fact that spoofing is impossible if a class has a name
+         // of the form "java.*"
+         if ((name != null) && name.startsWith("java.")) {
+             throw new SecurityException("Prohibited package name: "
+                     + name.substring(0, name.lastIndexOf('.')));
+         }
+         if (pd == null) {
+             pd = defaultDomain;
+         }
+
+         if (name != null) {
+             checkCerts(name, pd.getCodeSource());
+         }
+         return pd;
+     }
+ ```
+
+
+
+**类加载过程**
+
+> 加载---->验证---->准备---->解析---->初始化
+>
+> 1. **加载**：把class文件解析成二进制数据
+> 2. **验证：**验证class文件的格式和数据的正确性，是否符合标准的class文件的定义
+> 3. **准备：**为类变量（常量和静态变量赋初始值）。```byte```、``short``、``int``、``long``的默认值为**0**、`float`、`double`的默认值为**0.0**、`char`的默认值为``''``、`boolean`的默认值为**false**；引用类型的初始值为null；常量类型的初始值为代码中设置的值。
+> 4. **解析：**将常量池内的符号引用替换为直接引用。在解析阶段，虚拟机会把所有的类名、方法名、字段名这些符号引用替换为具体的内存地址或者偏移量。
+> 5. **初始化：**这个阶段主要是对类变量初始化，执行静态代码块
+
+
+
+### Class.forName和ClassLoader的loadClass方法的区别
+
+> ``ClassLoader``的``loadClass``方法仅仅是把Class文件变成虚拟机的运行时数据结构Class；而``Class.forName``除了会把Class文件变成虚拟机的运行时数据结构Class之外，还会触发类的初始化
+
+
+
+### 内存分区
+
+堆、虚拟机栈、本地方法栈、程序计数器、方法区
+
+* **堆：**线程共享，主要是存放对象实例和数组。当空间不足分配对象时会触发**OutOfMemoryError**
+
+* **虚拟机栈：**线程私有，存储局部变量表、操作数栈、动态链接、方法出口；当空间不足时，会触发StackOverflowError
+
+* **本地方法栈：**供Native方法使用的栈
+
+* **程序计数器：**存储线程当前执行的Java方法代码的指令地址，如果执行的方法是Native方法，那么此时程序计数器存储的值是```undefined```
+
+* **方法区：** 存储已被虚拟机加载的类信息、运行时常量池、静态变量、即时编译器编译后的代码等数据
+
+  > In the method area, all class level information like class name, immediate parent class name, methods and variables information etc. are stored, including static variables. There is only one method area per JVM, and it is a shared resource
+
+***对象分配过程***：对象首先分配在Eden区，当Eden区满的时候会触发Minor GC，把Eden区存活的对象放到S0区；如果此时Eden区仍然无法满足对象分配的空间，那么会尝试将对象放到老年代；如果老年代空间不足，则进行Major GC。
+
+
+
+**垃圾回收器**
+
+
+
+#### 虚拟机调优
+
+**jstat指令**
+
+> jstat(JVM statistics Monitoring)是用于监视虚拟机运行时状态信息的命令，它可以显示出虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据。
+>
+> ```jstat -gc 1262 2000 20```: 这个命令意思就是每隔2000ms输出1262的gc情况，一共输出20次
+>
+> - S0C : survivor0区的总容量
+> - S1C : survivor1区的总容量
+> - S0U : survivor0区已使用的容量
+> - S1U : survivor1区已使用的容量
+> - EC : Eden区的总容量
+> - EU : Eden区已使用的容量
+> - OC : Old区的总容量
+> - OU : Old区已使用的容量
+> - PC: 当前perm的容量 (KB)
+> - PU: perm的使用 (KB)
+> - YGC : 新生代垃圾回收次数
+> - YGCT : 新生代垃圾回收时间
+> - FGC : 老年代垃圾回收次数
+> - FGCT : 老年代垃圾回收时间
+> - GCT : 垃圾回收总消耗时间
+>
+> ##### -gccapacity
+>
+> 同-gc，不过还会输出Java堆各区域使用到的最大、最小空间
+>
+> - NGCMN : 新生代占用的最小空间
+> - NGCMX : 新生代占用的最大空间
+> - OGCMN : 老年代占用的最小空间
+> - OGCMX : 老年代占用的最大空间
+> - OGC：当前年老代的容量 (KB)
+> - OC：当前年老代的空间 (KB)
+> - PGCMN : perm占用的最小空间
+> - PGCMX : perm占用的最大空间
+>
+> ##### -gcutil
+>
+> 同-gc，不过输出的是已使用空间占总空间的百分比
+
+
+
+**jmap**命令
+
+> jmap(JVM Memory Map)命令用于生成heap dump文件，如果不使用这个命令，还阔以使用-XX:+HeapDumpOnOutOfMemoryError参数来让虚拟机出现OOM的时候·自动生成dump文件。 jmap不仅能生成dump文件，还阔以查询finalize执行队列、Java堆和永久代的详细信息，如当前使用率、当前使用的是哪种收集器等。
+>
+> **option参数**
+>
+> - dump : 生成堆转储快照
+> - finalizerinfo : 显示在F-Queue队列等待Finalizer线程执行finalizer方法的对象
+> - heap : 显示Java堆详细信息
+> - histo : 显示堆中对象的统计信息
+> - permstat : to print permanent generation statistics
+> - F : 当-dump没有响应时，强制生成dump快照
+>
+> ##### -dump
+>
+> 常用格式
+>
+> ```
+> -dump::live,format=b,file=<filename> pid
+> ```
+>
+> dump堆到文件,format指定输出格式，live指明是活着的对象,file指定文件名
+>
+> ```
+> $ jmap -dump:live,format=b,file=dump.hprof 28920  Dumping heap to /home/xxx/dump.hprof ...  Heap dump file created
+> ```
+>
+> dump.hprof这个后缀是为了后续可以直接用MAT(Memory Anlysis Tool)打开。
+
+
+
+**jstack指令**
+
+> jstack用于生成java虚拟机当前时刻的线程快照。线程快照是当前java虚拟机内每一条线程正在执行的方法堆栈的集合，生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等。
+>
+> ### option参数
+>
+> - -F : 当正常输出请求不被响应时，强制输出线程堆栈
+> - -l : 除堆栈外，显示关于锁的附加信息
+> - -m : 如果调用到本地方法的话，可以显示C/C++的堆栈
+>
+> jstack -l 11494
+>
+>
+
+### Happen-before原则
+
+1. **单线程happen-before原则：**在同一个线程中，发生在前面的操作happen-before于后面的操作
+
+2. **锁的happen-before原则：**同一个锁的unlock操作happen-before于此锁的lock操作
+3. **volatile的happen-before原则：**对一个volatile变量的写操作happen-before于后续对该volatile变量的所有的读操作
+4. **线程启动的happen-before原则：**Thread 对象的 start() 方法先行于此线程的每一个动作
+5. **happen-before的传递性：**a happen-before b ，b happen-before c ，那么 a happen-before c 。
+
+### **volatile 使用了内存屏障实现可见性**
+
+- 在每个 volatile写操作的前面插入一个Storestore屏障。
+- 在每个 volatile写操作的后面插入一个Storeload屏障。
+- 在每个 volatile读操作的后面插入一个Loadload屏障。
+- 在每个 volatile读操作的后面插入一个Loadstore屏障。
+
+
+
+**Spring事务传播机制**
+
+* **REQUIRED：**当前存在事务，则加入当前事务，如果当前没有事务，就新建一个事务方法执行
+* **SUPPORTS：**当前存在事务，则加入当前事务，如果当前没有事务，就以非事务方法执行
+* **MANDATORY：**当前存在事务，则加入当前事务，如果当前事务不存在，则抛出异常
+* **REQUIRES_NEW：**创建一个新事务，如果存在当前事务，则挂起该事务
+* **NOT_SUPPORTED：**始终以非事务方式执行,如果当前存在事务，则挂起当前事务
+* **NEVER：**不使用事务，如果当前事务存在，则抛出异常
+* **NESTED：**如果当前事务存在，则在嵌套事务中执行，否则REQUIRED的操作一样（开启一个事务）
+
+
+     */
+
+    // _____________________________________________ JAVA _______________________________________________________________
+
+
+    // ===================================================================================================================================
+
     /*
 
 HTTPS原理:(来自《普林斯顿大学计算机公开课》)
