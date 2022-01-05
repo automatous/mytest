@@ -1,5 +1,6 @@
 package com.example.demo.interview.alg;
 
+import com.example.demo.alg.LinkedNodeTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -1822,4 +1823,233 @@ public class Shopee {
         posOrderIterative(root);
     }
 
+    // ===================================================================================
+
+    // ========================================== 在 O(1) 时间内删除链表节点 ==============================================
+    static class LinkedNode {
+        int value;
+        LinkedNode next;
+
+        public LinkedNode(int value, LinkedNode next) {
+            this.value = value;
+            this.next = next;
+        }
+
+        @Override
+        public String toString() {
+            return "" + value;
+        }
+    }
+
+
+    public static LinkedNode deleteNode(LinkedNode head, LinkedNode tobeDelete) {
+        if (head == null || tobeDelete == null) {
+            return head;
+        }
+        if (tobeDelete.next != null) {
+            // 需要删除的节点不是尾节点
+            LinkedNode next = tobeDelete.next;
+            tobeDelete.value = next.value;
+            tobeDelete.next = next.next;
+        } else {
+            if (head == tobeDelete) {
+                // 只有一个节点
+                // *需要注意: 这里仅仅只是将此方法的栈变量head设为null, 原调用函数的head不受影响! 所以需要返回所谓的head作为返回值, 用于重新赋值原调用函数的head(C语言可以通过传指针赋值)
+                head = null;
+            } else {
+                // 待删除节点为尾节点
+                LinkedNode cur = head;
+                while (cur.next != tobeDelete) {
+                    cur = cur.next;
+                }
+                cur.next = null;
+            }
+        }
+        return head;
+    }
+
+    // ============================ 链表环入口节点 ===========================================
+    public LinkedNode entryNodeOfLoop(LinkedNode head) {
+        if (head == null || head.next == null) {
+            return null;
+        }
+        LinkedNode fast = head;
+        LinkedNode slow = head;
+
+        do {
+            fast = fast.next.next;
+            slow = slow.next;
+        } while (fast != null && fast.next != null && fast != slow);
+
+        if (fast == null || fast.next == null) {
+            return null;
+        }
+
+        /*
+         * 设: head到环入口节点的长度为l, 环的长度为r, 环入口节点到相交节点的长度为d, 可得:
+         * fast = l + r + d
+         * slow = l + d
+         * 又因为: 2 * slow = fast
+         * 结合上述3式, 得: r - d = l
+         * 所以, 当fast与slow相交时, 相交节点与环入口节点的长度等于head到入口节点的长度
+         */
+        fast = head;
+        while (slow != fast) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+
+        return slow;
+    }
+
+    // =========================================== max heap ==================================================================
+     static class MaxHeap {
+
+        public static void swap(int[] arr, int a, int b) {
+            int temp = arr[a];
+            arr[a] = arr[b];
+            arr[b] = temp;
+        }
+
+        public static int left(int i) {
+            return 2 * i + 1;
+        }
+
+        public static int right(int i) {
+            return 2 * (i + 1);
+        }
+
+        public static int parent(int i) {
+            return (i - 1) / 2;
+        }
+
+        public static void maxHeapify(int[] arr, int i, int maxIdx) {
+            maxIdx = maxIdx == -1 ? arr.length - 1 : maxIdx;
+            int l = left(i);
+            int r = right(i);
+            int largest;
+            if (l <= maxIdx && arr[l] > arr[i]) {
+                largest = l;
+            } else {
+                largest = i;
+            }
+            if (r <= maxIdx && arr[r] > arr[largest]) {
+                largest = r;
+            }
+            if (largest != i) {
+                swap(arr, i, largest);
+                maxHeapify(arr, largest, maxIdx);
+            }
+        }
+
+        public static void maxHeapify(int arr[], int i) {
+            int l = left(i);
+            int r = right(i);
+            int largest;
+            if (l < arr.length && arr[l] > arr[i]) {
+                largest = l;
+            } else {
+                largest = i;
+            }
+            if (r < arr.length && arr[r] > arr[largest]) {
+                largest = r;
+            }
+            if (largest != i) {
+                swap(arr, i, largest);
+                maxHeapify(arr, largest);
+            }
+        }
+
+        public static void buildMaxHeap(int arr[]) {
+            int maxIdx = arr.length - 1;
+            int parent = parent(maxIdx);
+            for (int i = parent; i >= 0; i--) {
+                maxHeapify(arr, i, -1);
+            }
+        }
+
+        public static void heapSort(int arr[]) {
+            buildMaxHeap(arr);
+            int maxIdx = arr.length - 1;
+            while (maxIdx > 0) {
+                swap(arr, 0, maxIdx);
+                maxIdx--;
+                maxHeapify(arr, 0, maxIdx);
+            }
+        }
+
+        public static int extractMax(int arr[]) {
+            if (arr.length < 1) {
+                throw new RuntimeException("heap underflow");
+            }
+            int maxIdx = arr.length - 1;
+            int max = arr[0];
+            arr[0] = arr[maxIdx];
+            maxIdx--;
+            maxHeapify(arr, 0, maxIdx);
+            return max;
+        }
+
+        public static void increaseKey(int arr[], int i, int key) {
+            if (key < arr[i]) {
+                throw new RuntimeException("new key is smaller then current key");
+            }
+            arr[i] = key;
+            while (i > 0 && arr[parent(i)] < arr[i]) {
+                swap(arr, i, parent(i));
+                i = parent(i);
+            }
+        }
+
+        /**
+         * 此方法只能用于最大值的插入: 先于最大堆的最大值进行比较, 若比最大堆的最大值还大, 则调用此方法扩容; 若小则next
+         */
+        public static int[] heapInsert(int arr[], int key) {
+            int length = arr.length;
+            int len = length + 1;
+            int[] A = Arrays.copyOf(arr, len);
+            increaseKey(A, length, key);
+            return A;
+        }
+
+        public static void main(String[] args) {
+            int arr[] = {8, 2, 3, 7, 0, 1, 4, 6, 5, 9};
+//        maxHeapify(arr, arr.length - 1, -1);
+//        buildMaxHeap(arr);
+//        heapSort(arr);
+//        int max = extractMax(arr);
+//        System.out.println(max);
+//        increaseKey(arr, 1, 10);
+//        int[] A = heapInsert(arr, 10);
+//        System.out.println(Arrays.toString(arr));
+//        System.out.println(Arrays.toString(A));
+
+            long start = System.currentTimeMillis();
+            int A[] = {};
+            for (int i : arr) {
+                A = heapInsert(A, i);
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("spend time: " + (end - start));
+            System.out.println(Arrays.toString(A));
+        }
+    }
+
+    // ========================== 数学证明 =================================
+    /*
+     * 证明：
+     * -x = ~x + 1
+     * 解：
+     * 因为x + (-x) = 0
+     * 把 -x = ~x + 1代入上式
+     * x + (~x + 1) = 0显然成立，故即证
+     *
+     * 证明：(换元法)
+     * -x = ~(x - 1)
+     * 解：
+     * 设 y = ~(x - 1)，得：~y = x - 1，即：x = ~y + 1
+     * 又因为：x + (-x) = 0
+     * 综合上述3式，得：
+     * ~y + 1 + ~(~y + 1 - 1) = ~y + 1 + y = 0显然成立，故即证
+     */
 }
