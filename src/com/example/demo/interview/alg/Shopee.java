@@ -1830,6 +1830,13 @@ public class Shopee {
         int value;
         LinkedNode next;
 
+        public LinkedNode() {
+        }
+
+        public LinkedNode(int value) {
+            this.value = value;
+        }
+
         public LinkedNode(int value, LinkedNode next) {
             this.value = value;
             this.next = next;
@@ -1868,6 +1875,40 @@ public class Shopee {
         return head;
     }
 
+    public static ListNode deleteNode(ListNode head, ListNode tobeDeleteNode) {
+        if (head == null || tobeDeleteNode == null) {
+            return head;
+        }
+
+        if (head == tobeDeleteNode) {
+            // 删除头节点
+            head = head.next;
+        } else if (tobeDeleteNode.next != null) {
+            // 中间
+            tobeDeleteNode.val = tobeDeleteNode.next.val;
+            tobeDeleteNode.next = tobeDeleteNode.next.next;
+        } else {
+            // 最后
+            ListNode cur = head;
+            while (cur.next != tobeDeleteNode) {
+                cur = cur.next;
+            }
+            cur.next = null;
+        }
+
+        return head;
+    }
+
+    @Test
+    public void testDeleteNode() {
+        ListNode a, b, c;
+        ListNode head = a = new ListNode(0, new ListNode(1, new ListNode(2, new ListNode(3, b = new ListNode(4, new ListNode(5, new ListNode(6, c = new ListNode(7))))))));
+        head = deleteNode(head, a);
+        head = deleteNode(head, b);
+        head = deleteNode(head, c);
+        System.out.println(head);
+    }
+
     // ============================ 链表环入口节点 ===========================================
     public LinkedNode entryNodeOfLoop(LinkedNode head) {
         if (head == null || head.next == null) {
@@ -1900,6 +1941,42 @@ public class Shopee {
         }
 
         return slow;
+    }
+
+
+    public static LinkedNode entryOfLoop(LinkedNode head) {
+        if (head == null || head.next == null) {
+            return null;
+        }
+
+        LinkedNode slow = head, fast = head;
+        do {
+            fast = fast.next.next;
+            slow = slow.next;
+        } while (fast != null && fast.next != null && slow != fast);
+
+        if (fast == null) {
+            return null;
+        }
+
+        fast = head;
+        while (fast != slow) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+
+        return fast;
+    }
+
+    @Test
+    public void testEntryOfLoop() {
+        LinkedNode a, b;
+        LinkedNode head = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3,
+                a = new LinkedNode(4, new LinkedNode(5, new LinkedNode(6,
+                        b = new LinkedNode(7))))))));
+//        b.next = a;
+        LinkedNode entryNode = entryNodeOfLoop(head);
+        System.out.println(entryNode);
     }
 
     // =========================================== max heap ==================================================================
