@@ -8,10 +8,166 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== bitwise =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+    public static int onceNum(int[] a, int k) {
+        int res = 0;
+        int intLength = 32;
+        int[] bitwiseArr = new int[intLength];
+        for (int i : a) {
+            for (int j = 0; j < intLength; j++) {
+                bitwiseArr[j] += ((i >>> j) & 1);
+            }
+        }
+
+        for (int i = 0; i < intLength; i++) {
+            bitwiseArr[i] %= k;
+            res ^= (bitwiseArr[i] << i);
+        }
+
+        return res;
+    }
+
+    @Test
+    public void testOnceNum() {
+        int[][] m = {
+                {1, 1, 1, 2, 2, 2, 11, 3, 11, 11, 22, 22, 22},      // k=3, 3
+                {1, 1, 1, 1, 22, 22, 22, 5, 22, 2, 2, 2, 2, 4, 4, 4, 4},// k=4, 5
+                {22, 22, 44, -10, 44, -1, -1, -2, -2},          // k=2, -10
+                {1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 5, -1, 4, 3, 2, 1, 1, 2, 3, 4, 5},    // k=5, -1
+        };
+
+        int[] a = {3, 4, 2, 5};
+        for (int i = 0; i < a.length; i++) {
+            System.out.println(onceNum(m[i], a[i]));
+        }
+    }
+
+    // =============================================================================
+    public static void printOddTimesNum2(int[] a) {
+        int xor = 0;
+        for (int i : a) {
+            xor ^= i;
+        }
+
+//        int xorHasOne = xor & (~xor + 1); // (~xor + 1) <==> (-xor)
+        int xorHasOne = xor & (-xor);
+        int one = 0;
+        int two;
+        for (int i : a) {
+            if ((i & xorHasOne) != 0) {
+                one ^= i;
+            }
+        }
+
+        two = xor ^ one;
+        System.out.println(one + ", " + two);
+    }
+
+
+    @Test
+    public void testOddTimeNum2() {
+        int[][] m = {
+                {1, 1, 2, 2, 3, 4},                 // 3,   4
+                {10, 10, 22, 23, 33, 33, 23, 24},   // 22,  24
+                {11, 22, 33, 22, 11, 44},           // 33,  44
+                {0, -1, -2, -3, -2, -1, 0, -4},     // -3,  -4
+                {0, 1, 1, -1, -1, 22},              // 0,   22
+        };
+
+        for (int[] a : m) {
+            printOddTimesNum2(a);
+        }
+
+    }
+
+
+    public static void printOddTimesNum1(int[] a) {
+        int xor = 0;
+        for (int i : a) {
+            xor ^= i;
+        }
+        System.out.println(xor);
+    }
+
+    @Test
+    public void testOddTimeNum1() {
+        int[][] m = {
+                {1, 1, 2, 2, 3},                // 3
+                {10, 10, 22, 23, 33, 33, 23},   // 22
+                {11, 22, 33, 22, 11},           // 33
+                {0, -1, -2, -3, -2, -1, 0},     // -3
+                {0, 1, 1, -1, -1},              // 0
+        };
+
+        for (int[] a : m) {
+            printOddTimesNum1(a);
+        }
+
+    }
+
+
+    // ==========================================================================
+
+    public static int countIII(int n) {
+        int res = 0;
+        while (n != 0) {
+            res++;
+            n = n & (n - 1);
+        }
+        return res;
+    }
+
+    public static int countII(int n) {
+        int res = 0, mask = 1;
+        while (mask != 0) {
+            if ((n & mask) != 0) {
+                res++;
+            }
+            mask = mask << 1;
+        }
+        return res;
+    }
+
+    public static int countI(int n) {
+        int res = 0;
+        while (n != 0) {
+            res += n & 1;
+            n = n >>> 1;
+        }
+        return res;
+    }
+
+    @Test
+    public void testCount() {
+        int[] a = {1, 0, -1, 7, 8, 15, 16};
+        for (int i : a) {
+//            System.out.println(countI(i));
+//            System.out.println(countII(i));
+            System.out.println(countIII(i));
+        }
+    }
+
+
     public static int oppositeNum(int a) {
         return add(~a, 1);
     }
 
+
+    // ==========================================================================
+
+    public static int addIIRecursive(int a, int b) {
+        return b == 0 ? a : addIIRecursive(a ^ b, (a & b) << 1);
+    }
+
+    public static int addII(int a, int b) {
+        int t;
+        while (b != 0) {
+            t = (a & b) << 1;
+            a = a ^ b;
+            b = t;
+        }
+        return a;
+    }
+    // ==========================================================================
     public static int addRecursive(int a, int b) {
         return a == 0 ? b : addRecursive((a & b) << 1, a ^ b);
     }
@@ -25,6 +181,7 @@ public class CodingInterviewGuide {
         }
         return b;
     }
+    // ==========================================================================
 
     public static int sub(int a, int b) {
         return add(a, oppositeNum(b));
@@ -44,9 +201,11 @@ public class CodingInterviewGuide {
         for (int[] a : matrix) {
             System.out.print(Arrays.toString(a));
             System.out.print(": \t\t");
-            System.out.print(addRecursive(a[0], a[1]));
+//            System.out.print(addRecursive(a[0], a[1]));
+            System.out.print(addIIRecursive(a[0], a[1]));
             System.out.print("\t");
-            System.out.print(add(a[0], a[1]));
+//            System.out.print(add(a[0], a[1]));
+            System.out.print(addII(a[0], a[1]));
             System.out.print("\t");
             System.out.print(sub(a[0], a[1]));
             System.out.println();
