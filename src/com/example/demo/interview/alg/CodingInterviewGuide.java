@@ -3,10 +3,192 @@ package com.example.demo.interview.alg;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Stack;
 
 public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== offer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
+
+    // TODO 1. 迭代的加入stack中  2. 将还有parent的treeNode变成双向队列
+    static class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode parent;
+
+        public TreeNode() {
+        }
+
+        public TreeNode(int val) {
+            this.val = val;
+        }
+
+        public TreeNode(int val, TreeNode left, TreeNode right) {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+
+        public TreeNode(int val, TreeNode left, TreeNode right, TreeNode parent) {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+            this.parent = parent;
+        }
+
+        @Override
+        public String toString() {
+            return "TreeNode{" +
+                    "val=" + val +
+                    '}';
+        }
+    }
+
+    public static void getTreeNodePath(TreeNode root, TreeNode t1, Stack<TreeNode> stack) {
+        stack.add(root);
+        TreeNode cur = root;
+        TreeNode left = root.left;
+        TreeNode right = root.right;
+        while (cur != t1) {
+            cur = root.left;
+            cur = root.right;
+        }
+        if (root == t1) {
+            return;
+        }
+        getTreeNodePath(root.left, t1, stack);
+        getTreeNodePath(root.right, t1, stack);
+        stack.pop();
+    }
+
+    public static TreeNode lowestCommonAncestor(TreeNode root, TreeNode t1, TreeNode t2) {
+        if (root == null) {
+            return null;
+        } else if (t1 == null) {
+            return t2;
+        } else if (t2 == null) {
+            return t1;
+        }
+
+        Stack<Integer> s1 = new Stack<>();
+        Stack<Integer> s2 = new Stack<>();
+
+        return null;
+    }
+
+
+    public static TreeNode lowestCommonAncestorRecursive(TreeNode root, TreeNode t1, TreeNode t2) {
+        if (root == null || root == t1 || root == t2) {
+            return root;
+        }
+
+        TreeNode left = lowestCommonAncestorRecursive(root.left, t1, t2);
+        TreeNode right = lowestCommonAncestorRecursive(root.right, t1, t2);
+        return left == null ? right : right == null ? left : root;
+    }
+
+    @Test
+    public void testLowestCommonAncestorRecursive() {
+        TreeNode t1 = null, t2 = null;
+        TreeNode root = new TreeNode(8,
+                new TreeNode(4,
+                        new TreeNode(2,
+                                new TreeNode(1),
+                                new TreeNode(3)),
+                        new TreeNode(6,
+                                new TreeNode(5),
+                                new TreeNode(7))),
+                new TreeNode(10,
+                        t1 = new TreeNode(9),
+                        t2 = new TreeNode(11)));
+
+        TreeNode ancestor = lowestCommonAncestorRecursive(root, t1, t2);
+        System.out.println(ancestor);
+    }
+
+
+    public static TreeNode lowestCommonAncestorWithParent(TreeNode root, TreeNode t1, TreeNode t2) {
+        if (root == null) {
+            return null;
+        } else if (t1 == null) {
+            return t2;
+        } else if (t2 == null) {
+            return t1;
+        }
+
+        TreeNode n1 = t1, n2 = t2;
+        while (n1 != n2) {
+            n1 = n1.parent == null ? t2 : n1.parent;
+            n2 = n2.parent == null ? t1 : n2.parent;
+        }
+
+        return n1;
+    }
+
+
+    @Test
+    public void testLowestCommonAncestorWithParent() {
+        TreeNode t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11;
+        TreeNode root = t8 = new TreeNode(8,
+                t4 = new TreeNode(4,
+                        t2 = new TreeNode(2,
+                                t1 = new TreeNode(1),
+                                t3 = new TreeNode(3)),
+                        t6 = new TreeNode(6,
+                                t5 = new TreeNode(5),
+                                t7 = new TreeNode(7))),
+                t10 = new TreeNode(10,
+                        t9 = new TreeNode(9),
+                        t11 = new TreeNode(11)));
+        t1.parent = t3.parent = t2;
+        t5.parent = t7.parent = t6;
+        t2.parent = t6.parent = t4;
+        t9.parent = t11.parent = t10;
+        t4.parent = t10.parent = t8;
+
+        TreeNode ancestor = lowestCommonAncestorWithParent(root, t1, t9);
+        System.out.println(ancestor);
+    }
+
+
+    public static TreeNode lowestCommonAncestor4BinarySearchTree(TreeNode root, TreeNode t1, TreeNode t2) {
+        if (root == null) {
+            return null;
+        } else if (t1 == null) {
+            return t2;
+        } else if (t2 == null) {
+            return t1;
+        }
+
+        if (root.val > t1.val && root.val > t2.val) {
+            return lowestCommonAncestor4BinarySearchTree(root.left, t1, t2);
+        } else if (root.val < t1.val && root.val < t2.val) {
+            return lowestCommonAncestor4BinarySearchTree(root.right, t1, t2);
+        } else {
+            return root;
+        }
+    }
+
+    @Test
+    public void testLowestCommonAncestorBinarySearchTree() {
+        TreeNode t1 = null, t2 = null;
+        TreeNode root = new TreeNode(8,
+                new TreeNode(4,
+                        new TreeNode(2,
+                                new TreeNode(1),
+                                new TreeNode(3)),
+                        new TreeNode(6,
+                                new TreeNode(5),
+                                new TreeNode(7))),
+                new TreeNode(10,
+                        new TreeNode(9),
+                        new TreeNode(11)));
+
+        TreeNode ancestor = lowestCommonAncestor4BinarySearchTree(root, t1, t2);
+        System.out.println(ancestor);
+    }
+
+
 
     public static class Str2Int {
         static int status;  // 0:正常 -1:非法输入

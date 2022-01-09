@@ -693,7 +693,7 @@ public class Shopee {
         }
     }
 
-    public ListNode MergeIterative(ListNode list1, ListNode list2) {
+    public ListNode mergeIterative(ListNode list1, ListNode list2) {
         ListNode head = new ListNode(-1);
         ListNode cur = head;
         while (list1 != null && list2 != null) {
