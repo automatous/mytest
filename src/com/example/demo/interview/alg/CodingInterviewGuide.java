@@ -6,6 +6,70 @@ import java.util.Arrays;
 
 public class CodingInterviewGuide {
 
+    // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== offer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
+
+    public static class Str2Int {
+        static int status;  // 0:正常 -1:非法输入
+
+        public static int str2Int(String s) {
+            status = -1;
+            long num = 0;
+            if (s != null && !"".equals(s)) {
+                char[] ca = s.toCharArray();
+                int length = ca.length;
+                int idx = 0;
+                boolean isNegative = false;
+                if (ca[idx] == '+') {
+                    idx++;
+                } else if (ca[idx] == '-') {
+                    isNegative = true;
+                    idx++;
+                }
+
+                if (idx != length) {
+                    while (idx != length) {
+                        char c = ca[idx];
+                        if (c >= '0' && c <= '9') {
+                            int val = c - '0';
+                            num = num * 10 + (isNegative ? -val : val);
+                            if (num > Integer.MAX_VALUE || num < Integer.MIN_VALUE) {
+                                num = 0;
+                                break;
+                            }
+                            idx++;
+                        } else {
+                            num = 0;
+                            break;
+                        }
+                    }
+                    if (idx == length) {
+                        status = 0;
+                    }
+                }
+            }
+            return (int) num;
+        }
+    }
+
+    @Test
+    public void testStr2Int() {
+        String[] sa = {
+                "", null,   // status = -1; return = 0
+                "+", "-",   // status = -1; return = 0
+                "" + (1L + Integer.MAX_VALUE), "" + (-1L + Integer.MIN_VALUE),  // status = -1; return = 0
+                "" + Integer.MAX_VALUE, "" + Integer.MIN_VALUE, // status = 0; max, min
+                "1", "-1", "0"};    // status = 0; 1, -1, 0
+
+        for (String s : sa) {
+            int ret = Str2Int.str2Int(s);
+            System.out.println(String.format("s = %s, status = %d, return = %d", s, Str2Int.status, ret));
+        }
+    }
+
+    // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== offer =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
+
+
+
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== bitwise =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
     public static int onceNum(int[] a, int k) {
