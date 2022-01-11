@@ -3,9 +3,364 @@ package com.example.demo.interview.alg;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 public class CodingInterviewGuide {
+
+
+    // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== xx =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
+    // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== xx =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
+
+    // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== list or tree =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
+
+    public static LinkedNode getIntersectNode(LinkedNode h1, LinkedNode h2) {
+        if (h1 == null || h2 == null) {
+            return null;
+        }
+
+        LinkedNode e1 = getLoopLinkedNode(h1);
+        LinkedNode e2 = getLoopLinkedNode(h2);
+        if (e1 == null && e2 == null) {
+            return noLoopFirstCommonNode(h1, h2);
+        } else if (e1 != null && e2 != null) {
+            return bothLoopFirstCommonNode(h1, e1, h2, e2);
+        }
+        return null;
+    }
+
+    @Test
+    public void testGetIntersectNode() {
+        LinkedNode n0, n1, n2, n3, n4, n5, n6, n7;
+        LinkedNode h1 = n0 = new LinkedNode(0, n1 = new LinkedNode(1, new LinkedNode(2, new LinkedNode(3,
+                n4 = new LinkedNode(4, new LinkedNode(5, n6 = new LinkedNode(6,
+                        n7 = new LinkedNode(7))))))));
+        n7.next = n1;
+
+//        n7.next = n4;
+//        LinkedNode h2 = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, n3 = new LinkedNode(3))));
+//        n3.next = n4;
+
+//        LinkedNode h2 = n0 = new LinkedNode(0);
+//        n0.next = n1;
+
+        LinkedNode h2 = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, n5 = new LinkedNode(5))))));
+        n5.next = n6;
+
+        LinkedNode intersectNode = getIntersectNode(h1, h2);
+        System.out.println(intersectNode);
+    }
+
+    public static LinkedNode bothLoopFirstCommonNode(LinkedNode h1, LinkedNode e1, LinkedNode h2, LinkedNode e2) {
+        if (h1 == null || e1 == null || h2 == null || e2 == null) {
+            return null;
+        }
+
+        if (e1 == e2) {
+            LinkedNode cur1 = h1;
+            LinkedNode cur2 = h2;
+            int n = 0;
+
+            while (cur1.next != e1) {
+                n++;
+                cur1 = cur1.next;
+            }
+            while (cur2.next != e2) {
+                n--;
+                cur2 = cur2.next;
+            }
+
+            cur1 = n > 0 ? h1 : h2;
+            cur2 = cur1 == h1 ? h2 : h1;
+            n = Math.abs(n);
+            while (n != 0) {
+                n--;
+                cur1 = cur1.next;
+            }
+            while (cur1 != cur2) {
+                cur1 = cur1.next;
+                cur2 = cur2.next;
+            }
+            return cur1;
+        } else {
+            LinkedNode cur = e1.next;
+            while (cur != e1) {
+                if (cur == e2) {
+                    return e1;
+                }
+                cur = cur.next;
+            }
+            return null;
+        }
+    }
+
+    @Test
+    public void testBothLoopFirstCommonNode() {
+        LinkedNode n0, n1, n2, n3, n4, n5, n6, n7;
+        LinkedNode h1 = n0 = new LinkedNode(0, n1 = new LinkedNode(1, new LinkedNode(2, new LinkedNode(3,
+                n4 = new LinkedNode(4, new LinkedNode(5, n6 = new LinkedNode(6,
+                        n7 = new LinkedNode(7))))))));
+        n7.next = n1;
+
+//        LinkedNode h2 = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, n3 = new LinkedNode(3))));
+//        n3.next = n4;
+
+//        LinkedNode h2 = n0 = new LinkedNode(0);
+//        n0.next = n1;
+
+        LinkedNode h2 = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, n5 = new LinkedNode(5))))));
+        n5.next = n6;
+
+        LinkedNode e1 = getLoopLinkedNode(h1);
+        LinkedNode e2 = getLoopLinkedNode(h2);
+        LinkedNode commonNode = bothLoopFirstCommonNode(h1, e1, h2, e2);
+        System.out.println(commonNode);
+    }
+
+
+    public static LinkedNode noLoopFirstCommonNode(LinkedNode h1, LinkedNode h2) {
+        if (h1 == null || h2 == null) {
+            return null;
+        }
+
+        LinkedNode cur1 = h1;
+        LinkedNode cur2 = h2;
+        int n = 0;
+        while (cur1.next != null) {
+            n++;
+            cur1 = cur1.next;
+        }
+        while (cur2.next != null) {
+            n--;
+            cur2 = cur2.next;
+        }
+
+        if (cur1 != cur2) {
+            return null;
+        }
+
+        cur1 = n > 0 ? h1 : h2;
+        cur2 = cur1 == h1 ? h2 : h1;
+        n = Math.abs(n);
+        while (n != 0) {
+            cur1 = cur1.next;
+            n--;
+        }
+
+        while (cur1 != cur2) {
+            cur1 = cur1.next;
+            cur2 = cur2.next;
+        }
+
+        return cur1;
+    }
+
+    @Test
+    public void testNoLoopFirstCommonNode() {
+        LinkedNode n1, n2;
+        LinkedNode h1 = new LinkedNode(1, new LinkedNode(2, n1 = new LinkedNode(3)));
+        LinkedNode h2 = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3,
+                n2 = new LinkedNode(4, new LinkedNode(5, new LinkedNode(6, new LinkedNode(7))))))));
+//        n1.next = n2;
+        LinkedNode commonNode = noLoopFirstCommonNode(h1, h2);
+        System.out.println(commonNode);
+    }
+
+
+    public static LinkedNode getLoopLinkedNode(LinkedNode head) {
+        if (head == null || head.next == null) {
+            return null;
+        }
+
+        LinkedNode fast = head;
+        LinkedNode slow = head;
+        do {
+            fast = fast.next.next;
+            slow = slow.next;
+        } while (fast != null && fast.next != null && fast != slow);
+
+        if (fast == null) {
+            return null;
+        }
+
+        fast = head;
+        while (fast != slow) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+
+        return fast;
+    }
+
+
+    @Test
+    public void testGetLoopLinkedNode() {
+        LinkedNode n1, n2;
+        LinkedNode head = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3,
+                n1 = new LinkedNode(4, new LinkedNode(5, new LinkedNode(6,
+                        n2 = new LinkedNode(7))))))));
+//        n2.next = n1;
+        LinkedNode loopEntryNode = getLoopLinkedNode(head);
+        System.out.println(loopEntryNode);
+    }
+
+
+    public static class LinkedNode {
+        int val;
+        LinkedNode next;
+
+        public LinkedNode(int val) {
+            this.val = val;
+        }
+
+        public LinkedNode(int val, LinkedNode next) {
+            this.val = val;
+            this.next = next;
+        }
+
+        @Override
+        public String toString() {
+            return "LinkedNode{" +
+                    "val=" + val +
+                    '}';
+        }
+    }
+
+
+    // ===============================================
+
+    @Test
+    public void testBst2Deque() {
+        Node root = new Node(6,
+                new Node(4,
+                        new Node(2,
+                                new Node(1),
+                                new Node(3)),
+                        new Node(5)),
+                new Node(7,
+                        null,
+                        new Node(9,
+                                new Node(8),
+                                null)));
+
+        inOrder(root);
+//        Node node = bst2Deque(root);
+//        root = null;
+        Node node = bst2DequeRecursive(root);
+        System.out.println(node);
+    }
+
+
+    static class ReturnType {
+        Node left;
+        Node right;
+
+        public ReturnType(Node start, Node right) {
+            this.left = start;
+            this.right = right;
+        }
+
+        @Override
+        public String toString() {
+            return "ReturnType{" +
+                    "start=" + left +
+                    ", end=" + right +
+                    '}';
+        }
+    }
+
+    public static Node bst2DequeRecursive(Node root) {
+        ReturnType ret = doBst2DequeRecursive(root);
+        return ret.left;
+    }
+
+    public static ReturnType doBst2DequeRecursive(Node root) {
+        if (root == null) {
+            return new ReturnType(null, null);
+        }
+
+        ReturnType leftRet = doBst2DequeRecursive(root.left);
+        ReturnType rightRet = doBst2DequeRecursive(root.right);
+        if (leftRet.right != null) {
+            leftRet.right.right = root;
+        }
+        if (rightRet.left != null) {
+            rightRet.left.left = root;
+        }
+        root.left = leftRet.right;
+        root.right = rightRet.left;
+
+        return new ReturnType(leftRet.left != null ? leftRet.left : root, rightRet.right != null ? rightRet.right : root);
+    }
+
+    public static Node bst2Deque(Node root) {
+        Queue<Node> queue = new LinkedList<>();
+        inOrder2Queue(root, queue);
+        if (queue.isEmpty()) {
+            return root;
+        }
+
+        Node head = queue.poll();
+        Node pre = head;
+        pre.left = null;
+        while (!queue.isEmpty()) {
+            Node cur = queue.poll();
+            pre.right = cur;
+            cur.left = pre;
+            pre = cur;
+        }
+
+        pre.right = null;
+
+        return head;
+    }
+
+    public static void inOrder2Queue(Node root, Queue<Node> queue) {
+        if (root == null) {
+            return;
+        }
+
+        inOrder2Queue(root.left, queue);
+        queue.offer(root);
+        inOrder2Queue(root.right, queue);
+    }
+
+    public static void inOrder(Node root) {
+        if (root == null) {
+            return;
+        }
+        inOrder(root.left);
+        System.out.println(root.val);
+        inOrder(root.right);
+    }
+
+
+    public static class Node {
+        int val;
+        Node left;
+        Node right;
+
+        public Node(int val) {
+            this.val = val;
+        }
+
+        public Node(int val, Node left, Node right) {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+
+        @Override
+        public String toString() {
+            return "Node{" +
+                    "val=" + val +
+                    '}';
+        }
+    }
+
+    // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== list or tree =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
+
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== offer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
@@ -189,7 +544,6 @@ public class CodingInterviewGuide {
     }
 
 
-
     public static class Str2Int {
         static int status;  // 0:正常 -1:非法输入
 
@@ -249,7 +603,6 @@ public class CodingInterviewGuide {
     }
 
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== offer =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
-
 
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== bitwise =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
@@ -413,6 +766,7 @@ public class CodingInterviewGuide {
         }
         return a;
     }
+
     // ==========================================================================
     public static int addRecursive(int a, int b) {
         return a == 0 ? b : addRecursive((a & b) << 1, a ^ b);
@@ -527,8 +881,6 @@ public class CodingInterviewGuide {
     }
 
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== bitwise =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
-
-
 
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== dp =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
