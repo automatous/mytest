@@ -15,6 +15,157 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== list or tree =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+    public static LinkedNode merge(LinkedNode h1, LinkedNode h2) {
+        if (h1 == null) {
+            return h2;
+        } else if (h2 == null) {
+            return h1;
+        }
+
+        LinkedNode h = h1.val < h2.val ? h1 : h2;
+        LinkedNode cur1 = h == h1 ? h1 : h2;
+        LinkedNode cur2 = h == h1 ? h2 : h1;
+        LinkedNode pre = null;
+        while (cur1 != null && cur2 != null) {
+            if (cur1.val < cur2.val) {
+                // 第1步肯定是走到这里, 所以可以保证else中的pre不为null, 所以智能提示有时候也没那么智能!!
+                pre = cur1;
+                cur1 = cur1.next;
+            } else {
+                LinkedNode next = cur2.next;
+                // 关于此处waring提示, 上述有说明
+                pre.next = cur2;
+                cur2.next = cur1;
+                pre = cur2;
+                cur2 = next;
+            }
+        }
+
+        pre.next = cur1 == null ? cur2 : cur1;
+
+        return h;
+    }
+
+    public static LinkedNode mergeRecursive(LinkedNode h1, LinkedNode h2) {
+        if (h1 == null) {
+            return h2;
+        } else if (h2 == null) {
+            return h1;
+        }
+
+        if (h1.val < h2.val) {
+            h1.next = mergeRecursive(h1.next, h2);
+            return h1;
+        } else {
+            h2.next = mergeRecursive(h1, h2.next);
+            return h2;
+        }
+    }
+
+    @Test
+    public void testMerge() {
+        LinkedNode h1 = new LinkedNode(1, new LinkedNode(5, new LinkedNode(6)));
+        LinkedNode h2 = new LinkedNode(2, new LinkedNode(3, new LinkedNode(7)));
+//        LinkedNode head = mergeRecursive(h1, h2);
+        LinkedNode head = merge(h1, h2);
+        System.out.println(head);
+    }
+
+    // ===============================================================================
+
+    public static LinkedNode insertNum(LinkedNode head, int num) {
+        LinkedNode node = new LinkedNode(num);
+        if (head == null) {
+            node.next = node;
+            return node;
+        }
+
+        LinkedNode pre = head;
+        LinkedNode cur = head.next;
+        while (cur != head) {
+            if (pre.val <= num && num <= cur.val) {
+                break;
+            }
+            pre = cur;
+            cur = cur.next;
+        }
+        pre.next = node;
+        node.next = cur;
+        return head.val < num ? head : node;
+    }
+
+    @Test
+    public void testInsertNum() {
+        LinkedNode head = null;
+        for (int i = 0; i < 4; i++) {
+            head = insertNum(head, i);
+        }
+        head = insertNum(head, -1);
+        head = insertNum(head, 4);
+        System.out.println(head);
+    }
+
+    // =========================================================================
+
+    public static LinkedNode selectionSort(LinkedNode head) {
+        if (head == null) {
+            return null;
+        }
+
+        LinkedNode tail = null;
+        LinkedNode cur = head;
+        while (cur != null) {
+            LinkedNode small = cur;
+            LinkedNode smallPre = getSmallestPreNode(cur);
+            if (smallPre != null) {
+                small = smallPre.next;
+                smallPre.next = small.next;
+            }
+            cur = cur == small ? cur.next : cur;
+
+            if (tail == null) {
+                head = small;
+            } else {
+                tail.next = small;
+            }
+            tail = small;
+        }
+
+        return head;
+    }
+
+    public static LinkedNode getSmallestPreNode(LinkedNode head) {
+        if (head == null) {
+            return null;
+        }
+        LinkedNode smallPre = null;
+        LinkedNode small = head;
+        LinkedNode pre = head;
+        LinkedNode cur = head.next;
+        while (cur != null) {
+            if (cur.val < small.val) {
+                smallPre = pre;
+                small = cur;
+            }
+            pre = cur;
+            cur = cur.next;
+        }
+
+        return smallPre;
+    }
+
+    @Test
+    public void testSelectionSort() {
+//        LinkedNode head = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4)))));
+//        LinkedNode head = new LinkedNode(4, new LinkedNode(3, new LinkedNode(2, new LinkedNode(1, new LinkedNode(0)))));
+//        LinkedNode head = new LinkedNode(3, new LinkedNode(1, new LinkedNode(2, new LinkedNode(4, new LinkedNode(0)))));
+        LinkedNode head = new LinkedNode(3, new LinkedNode(3, new LinkedNode(2, new LinkedNode(2, new LinkedNode(1)))));
+//        LinkedNode head = null;
+        LinkedNode newHead = selectionSort(head);
+        System.out.println(newHead);
+    }
+
+
     public static LinkedNode getIntersectNode(LinkedNode h1, LinkedNode h2) {
         if (h1 == null || h2 == null) {
             return null;
@@ -62,6 +213,7 @@ public class CodingInterviewGuide {
             LinkedNode cur2 = h2;
             int n = 0;
 
+            // WARNING! 判断结束的条件不是null, 而是e1或e2, 不然就会无限死循环了....
             while (cur1.next != e1) {
                 n++;
                 cur1 = cur1.next;
