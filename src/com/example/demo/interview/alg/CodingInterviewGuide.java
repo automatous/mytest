@@ -2,16 +2,226 @@ package com.example.demo.interview.alg;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 public class CodingInterviewGuide {
 
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== xx =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== xx =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
+
+
+    // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== list or tree summer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
+
+    public static class RetType {
+        TreeNode left;
+        TreeNode right;
+
+        public RetType(TreeNode left, TreeNode right) {
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    public static TreeNode bst2DequeRecursion(TreeNode root) {
+        return doBst2DequeRecursion(root).left;
+    }
+
+    public static RetType doBst2DequeRecursion(TreeNode root) {
+        if (root == null) {
+            return new RetType(null, null);
+        }
+
+        RetType left = doBst2DequeRecursion(root.left);
+        RetType right = doBst2DequeRecursion(root.right);
+
+        if (left.right != null) {
+            left.right.right = root;
+        }
+        if (right.left != null) {
+            right.left.left = root;
+        }
+        root.left = left.right;
+        root.right = right.left;
+
+        return new RetType(left.left != null ? left.left : root, right.right != null ? right.right : root);
+    }
+
+    public static TreeNode bst2DequeIterative(TreeNode root) {
+        // 暂无思路....
+        // 借用队列, 再中序遍历, 但中序遍历也用到了递归....所以有没有递归的中序遍历且保留路径? 应该是有的, 但是好绕....
+        return null;
+    }
+
+    @Test
+    public void testBinarySearchTreeToDeque() {
+        TreeNode root = new TreeNode(6,
+                new TreeNode(4,
+                        new TreeNode(2,
+                                new TreeNode(1),
+                                new TreeNode(3)),
+                        new TreeNode(5)),
+                new TreeNode(7,
+                        null,
+                        new TreeNode(9,
+                                new TreeNode(8),
+                                null)));
+
+        TreeNode node = bst2DequeRecursion(root);
+        System.out.println(node);
+    }
+
+    public static LinkedNode ss(LinkedNode head) {
+        if (head == null) {
+            return null;
+        }
+
+        LinkedNode tail = null;
+        LinkedNode cur = head;
+        while (cur != null) {
+            LinkedNode small = cur;
+            LinkedNode smallPre = obtainSmallestPreNode(cur);
+            if (smallPre != null) {
+                small = smallPre.next;
+                smallPre.next = small.next;
+            }
+            cur = cur == small ? cur.next : cur;
+
+            if (tail == null) {
+                head = small;
+            } else {
+                tail.next = small;
+            }
+            tail = small;
+        }
+        return head;
+    }
+
+    public static LinkedNode obtainSmallestPreNode(LinkedNode head) {
+        if (head == null) {
+            return null;
+        }
+
+        LinkedNode smallPre = null;
+        LinkedNode small = head;
+        LinkedNode pre = head;
+        LinkedNode cur = head.next;
+        while (cur != null) {
+            // #==> 此处判断依据为cur
+            if (cur.val < small.val) {
+                smallPre = pre;
+                small = cur;
+            }
+            pre = cur;
+            cur = cur.next;
+        }
+
+        return smallPre;
+    }
+
+    public static void relocate(LinkedNode head) {
+        if (head == null || head.next == null) {
+            return;
+        }
+
+        LinkedNode p1 = head;
+        LinkedNode p2 = head.next;
+        while (p2.next != null && p2.next.next != null) {
+            p1 = p1.next;
+            p2 = p2.next.next;
+        }
+
+        LinkedNode right = p1.next;
+        p1.next = null;
+        LinkedNode left = head;
+
+        // #==> 此处判断依据为next
+        while (left.next != null) {
+            LinkedNode ln = left.next;
+            LinkedNode rn = right.next;
+            left.next = right;
+            right.next = ln;
+            left = ln;
+            right = rn;
+        }
+        left.next = right;
+    }
+
+    @Test
+    public void testRelocate() {
+        List<LinkedNode> list = new ArrayList<>();
+        list.add(new LinkedNode(1));
+        list.add(new LinkedNode(1, new LinkedNode(2)));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4)))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6)))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6, new LinkedNode(7))))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6, new LinkedNode(7, new LinkedNode(8)))))))));
+        for (LinkedNode head : list) {
+            relocate(head);
+            System.out.println(head);
+        }
+    }
+
+
+    public static TreeNode inOrderNextNodeWithParent(TreeNode node) {
+        if (node == null) {
+            return null;
+        }
+
+        if (node.right != null) {
+            node = node.right;
+            // #==> 此处判断依据为left
+            while (node.left != null) {
+                node = node.left;
+            }
+            return node;
+        } else {
+            TreeNode parent;
+            // #==> 此处判断依据为parent
+            while ((parent = node.parent) != null) {
+                if (parent.left == node) {
+                    return parent;
+                }
+                node = parent;
+            }
+        }
+
+        return null;
+    }
+
+    @Test
+    public void testInOrderNextNodeWithParent() {
+        TreeNode t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11;
+        TreeNode root = t8 = new TreeNode(8,
+                t4 = new TreeNode(4,
+                        t2 = new TreeNode(2,
+                                t1 = new TreeNode(1),
+                                t3 = new TreeNode(3)),
+                        t6 = new TreeNode(6,
+                                t5 = new TreeNode(5),
+                                t7 = new TreeNode(7))),
+                t10 = new TreeNode(10,
+                        t9 = new TreeNode(9),
+                        t11 = new TreeNode(11)));
+        t1.parent = t3.parent = t2;
+        t5.parent = t7.parent = t6;
+        t2.parent = t6.parent = t4;
+        t9.parent = t11.parent = t10;
+        t4.parent = t10.parent = t8;
+
+        List<TreeNode> list = Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, null);
+        for (TreeNode node : list) {
+            TreeNode next = inOrderNextNodeWithParent(node);
+            String s = String.format("cur = %s, next = %s", node, next);
+            System.out.println(s);
+        }
+    }
+
+
+
+    // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== list or tree summer =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== list or tree =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
@@ -156,12 +366,13 @@ public class CodingInterviewGuide {
 
     @Test
     public void testSelectionSort() {
-//        LinkedNode head = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4)))));
+        LinkedNode head = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4)))));
 //        LinkedNode head = new LinkedNode(4, new LinkedNode(3, new LinkedNode(2, new LinkedNode(1, new LinkedNode(0)))));
 //        LinkedNode head = new LinkedNode(3, new LinkedNode(1, new LinkedNode(2, new LinkedNode(4, new LinkedNode(0)))));
-        LinkedNode head = new LinkedNode(3, new LinkedNode(3, new LinkedNode(2, new LinkedNode(2, new LinkedNode(1)))));
+//        LinkedNode head = new LinkedNode(3, new LinkedNode(3, new LinkedNode(2, new LinkedNode(2, new LinkedNode(1)))));
 //        LinkedNode head = null;
-        LinkedNode newHead = selectionSort(head);
+//        LinkedNode newHead = selectionSort(head);
+        LinkedNode newHead = ss(head);
         System.out.println(newHead);
     }
 
