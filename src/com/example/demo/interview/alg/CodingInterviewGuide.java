@@ -13,6 +13,118 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== list or tree summer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+
+    public static LinkedNode reverseKNode(LinkedNode head, int k) {
+        if (k < 2 || head == null || head.next == null) {
+            return head;
+        }
+
+        LinkedNode cur = head;
+        LinkedNode pre = null;
+        LinkedNode start = null;
+        LinkedNode next = null;
+        int count = 0;
+        while (cur != null) {
+            count++;
+            next = cur.next;
+            if (count == k) {
+                start = pre == null ? head : pre.next;
+                head = pre == null ? cur : head;
+                reverse(pre, start, cur, next);
+                pre = start;
+                count = 0;
+            }
+            cur = next;
+        }
+
+        return head;
+    }
+
+    public static void reverse(LinkedNode left, LinkedNode start, LinkedNode end, LinkedNode right) {
+        LinkedNode pre = start;
+        LinkedNode cur = start.next;
+        while (cur != right) {
+            LinkedNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        if (left != null) {
+            left.next = end;
+        }
+        start.next = right;
+    }
+
+
+    @Test
+    public void testReverseKNode() {
+        /*
+         * 给定这个链表：1->2->3->4->5
+         * 当 k = 2 时，应当返回: 2->1->4->3->5
+         * 当 k = 3 时，应当返回: 3->2->1->4->5
+         * 当 k = 4 时，应当返回: 4->3->2->1->5
+         * 当 k = 5 时，应当返回: 5->4->3->2->1
+         * 当 k = 6 时，应当返回: 1->2->3->4->5
+         */
+
+        for (int i = 0; i <= 6; i++) {
+            LinkedNode head = new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5)))));
+            LinkedNode newHead = reverseKNode(head, i);
+            System.out.println(newHead);
+        }
+    }
+
+    // =========================================================================
+
+    public static TreeNode bstConvertDeque(TreeNode root) {
+        TreeNode[] head = new TreeNode[1];
+        TreeNode[] pre = new TreeNode[1];
+        doBstConvertDeque(root, head, pre);
+        return head[0];
+    }
+
+    public static void doBstConvertDeque(TreeNode root, TreeNode[] head, TreeNode[] pre) {
+        if (root == null) {
+            return;
+        }
+
+        doBstConvertDeque(root.left, head, pre);
+
+        if (pre[0] != null) {
+            pre[0].right = root;
+        }
+        root.left = pre[0];
+        pre[0] = root;
+
+        if (head[0] == null) {
+            head[0] = root;
+        }
+
+        doBstConvertDeque(root.right, head, pre);
+    }
+
+    @Test
+    public void testBstConvertDeque() {
+        TreeNode root = new TreeNode(6,
+                new TreeNode(4,
+                        new TreeNode(2,
+                                new TreeNode(1),
+                                new TreeNode(3)),
+                        new TreeNode(5)),
+                new TreeNode(7,
+                        null,
+                        new TreeNode(9,
+                                new TreeNode(8),
+                                null)));
+
+
+        inOrderPrint(root);
+        TreeNode head = bstConvertDeque(root);
+        System.out.println(head);
+    }
+
+    // ====================================================================================
+
     static class RandomLinkedNode {
         int val;
         RandomLinkedNode random = null;
@@ -121,7 +233,7 @@ public class CodingInterviewGuide {
             return;
         }
         inOrderPrint(root.left);
-        System.out.println(root.val);
+        System.out.println(root);
         inOrderPrint(root.right);
     }
 
