@@ -13,6 +13,145 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== list or tree summer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+    static class RandomLinkedNode {
+        int val;
+        RandomLinkedNode random = null;
+        RandomLinkedNode next = null;
+
+        public RandomLinkedNode(int val) {
+            this.val = val;
+        }
+
+        public RandomLinkedNode(int val, RandomLinkedNode next) {
+            this.val = val;
+            this.next = next;
+        }
+
+        public RandomLinkedNode(int val, RandomLinkedNode next, RandomLinkedNode random) {
+            this.val = val;
+            this.random = random;
+            this.next = next;
+        }
+
+        @Override
+        public String toString() {
+            return "RandomLinkedNode{" +
+                    "val=" + val +
+                    '}';
+        }
+    }
+
+    /**
+     * 越少的变量, 越容易管控, less is more
+     * 若一个变量可以代替另一个变量, 则不要多声明一个变量; 除非2个变量有明确的不同职责, 如: 指针p1/p2
+     */
+    public static RandomLinkedNode clone(RandomLinkedNode head) {
+        if (head == null) {
+            return null;
+        }
+
+        RandomLinkedNode cur = head;
+        while (cur != null) {
+            RandomLinkedNode clone = new RandomLinkedNode(cur.val);
+            clone.next = cur.next;
+            cur.next = clone;
+            cur = clone.next;
+        }
+
+        cur = head;
+        while (cur != null) {
+            RandomLinkedNode clone = cur.next;
+            if (cur.random != null) {
+                clone.random = cur.random.next;
+            }
+            cur = clone.next;
+        }
+
+        cur = head;
+        head = head.next;
+        RandomLinkedNode next;
+        while ((next = cur.next) != null) {
+            cur.next = next.next;
+            cur = next;
+        }
+
+        return head;
+    }
+
+    @Test
+    public void testClone() {
+        RandomLinkedNode r1, r2, r3, r4;
+        RandomLinkedNode head = r1 = new RandomLinkedNode(1, r2 = new RandomLinkedNode(2, r3 = new RandomLinkedNode(3, r4 = new RandomLinkedNode(4))));
+        r1.random = r3;
+        r2.random = r4;
+        r3.random = r1;
+        r4.random = r2;
+
+        RandomLinkedNode clone = clone(head);
+        System.out.println(clone);
+    }
+
+    // =============================================================================
+
+    public static List<TreeNode> findPath(TreeNode root, int sum) {
+        List<TreeNode> path = new ArrayList<>();
+        List<TreeNode> ret = new ArrayList<>();
+        doFindPath(root, sum, path, ret);
+        return ret;
+    }
+
+    public static void doFindPath(TreeNode root, int sum, List<TreeNode> path, List<TreeNode> ret) {
+        if (root == null) {
+            return;
+        }
+
+        path.add(root);
+        int t = sum - root.val;
+        if (t == 0) {
+            ret.addAll(path);
+            return;
+        }
+        doFindPath(root.left, t, path, ret);
+        doFindPath(root.right, t, path, ret);
+        path.remove(path.size() - 1);
+    }
+
+    public static void inOrderPrint(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        inOrderPrint(root.left);
+        System.out.println(root.val);
+        inOrderPrint(root.right);
+    }
+
+    @Test
+    public void testFindPath() {
+        TreeNode root = new TreeNode(7,
+                new TreeNode(4,
+                        new TreeNode(2,
+                                new TreeNode(1),
+                                new TreeNode(3)),
+                        new TreeNode(6,
+                                new TreeNode(5),
+                                null)),
+                new TreeNode(9,
+                        new TreeNode(8),
+                        new TreeNode(11,
+                                new TreeNode(10),
+                                null)));
+
+        inOrderPrint(root);
+
+        System.out.println(findPath(root, 17)); // 7 -> 4 -> 6
+        System.out.println(findPath(root, 14)); // 7 -> 4 -> 2 -> 1
+        System.out.println(findPath(root, 22)); // 7 -> 4 -> 6 -> 5
+        System.out.println(findPath(root, 37)); // 7 -> 9 -> 11 -> 10
+        System.out.println(findPath(root, 24)); // 7 -> 9 -> 8
+        System.out.println(findPath(root, 40)); // []
+    }
+
+
     public static class RetType {
         TreeNode left;
         TreeNode right;
