@@ -13,6 +13,128 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== list or tree summer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+    public LinkedNode removeKthFromTail(LinkedNode head, int k) {
+        if (k < 1 || head == null) {
+            return head;
+        }
+
+        LinkedNode cur = head;
+        while (cur != null) {
+            k--;
+            cur = cur.next;
+        }
+
+        if (k == 0) {
+            head = head.next;
+        }
+
+        if (k < 0) {
+            cur = head;
+            while (++k != 0) {
+                cur = cur.next;
+            }
+            cur.next = cur.next.next;
+        }
+        return head;
+    }
+
+    @Test
+    public void testRemoveKthFromTail() {
+        for (int i = 0; i <= 6; i++) {
+            LinkedNode head = new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5)))));
+            LinkedNode newHead = removeKthFromTail(head, i);
+            System.out.println(newHead);
+        }
+    }
+
+    // ========================================================================
+    public static LinkedNode removeNode(LinkedNode head, LinkedNode node) {
+        if (head == null) {
+            return null;
+        } else if (head == node) {
+            return head.next;
+        }
+
+        LinkedNode pre = head;
+        LinkedNode cur = head.next;
+        while (cur != null) {
+            if (cur == node) {
+                pre.next = cur.next;
+            }
+            pre = cur;
+            cur = cur.next;
+        }
+
+        return head;
+    }
+
+    @Test
+    public void testRemoveNode() {
+        LinkedNode node = null;
+        LinkedNode head = node = new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4))));
+        LinkedNode newHead = removeNode(head, node);
+        System.out.println(newHead);
+    }
+
+    public static LinkedNode findKthFromTail(LinkedNode head, int k) {
+        if (k < 1 || head == null) {
+            return head;
+        }
+
+        LinkedNode p1 = head, p2 = head;
+        while (k > 0 && p1 != null) {
+            k--;
+            p1 = p1.next;
+        }
+
+        if (k > 0) {
+            return null;
+        }
+
+        while (p1 != null) {
+            p1 = p1.next;
+            p2 = p2.next;
+        }
+
+        return p2;
+    }
+
+
+    // =====================================================================================================================
+
+    public static LinkedNode reverseFromTail2HeadWithDummy(LinkedNode head) {
+        LinkedNode dummy = new LinkedNode(-1);
+        LinkedNode cur = head;
+        while (cur != null) {
+            LinkedNode next = cur.next;
+            cur.next = dummy.next;
+            dummy.next = cur;
+            cur = next;
+        }
+        return dummy.next;
+    }
+
+    @Test
+    public void testReverseFromTail2HeadWithDummy() {
+        List<LinkedNode> list = new LinkedList<>();
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6, new LinkedNode(7, new LinkedNode(8)))))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6, new LinkedNode(7))))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6)))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4)))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3))));
+        list.add(new LinkedNode(1, new LinkedNode(2)));
+        list.add(new LinkedNode(1));
+        list.add(null);
+
+        for (LinkedNode head : list) {
+            LinkedNode newHead = reverseFromTail2HeadWithDummy(head);
+            System.out.println(newHead);
+        }
+    }
+
+
+    // ====================================================================
 
     public static LinkedNode reverseKNode(LinkedNode head, int k) {
         if (k < 2 || head == null || head.next == null) {
