@@ -13,6 +13,43 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== list or tree summer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+    public LinkedNode findKthFromTailPlus(LinkedNode head, int k) {
+        if (k < 1 || head == null) {
+            return null;
+        }
+
+        LinkedNode cur = head;
+        while (cur != null) {
+            k--;
+            cur = cur.next;
+        }
+
+        if (k == 0) {
+            return head;
+        }
+
+        if (k < 0) {
+            cur = head;
+            while (k != 0) {
+                cur = cur.next;
+                k++;
+            }
+        }
+
+        return cur;
+    }
+
+    @Test
+    public void testFindKthFromTailPlus() {
+        LinkedNode head = new LinkedNode(5, new LinkedNode(4, new LinkedNode(3, new LinkedNode(2, new LinkedNode(1)))));
+        for (int i = -1; i <= 6; i++) {
+            LinkedNode kthFromTailPlus = findKthFromTailPlus(head, i);
+            System.out.println(kthFromTailPlus);
+        }
+    }
+
+    // ====================================================================
+
     public LinkedNode removeKthFromTail(LinkedNode head, int k) {
         if (k < 1 || head == null) {
             return head;
@@ -181,12 +218,12 @@ public class CodingInterviewGuide {
     @Test
     public void testReverseKNode() {
         /*
-         * ç»™å®šè¿™ä¸ªé“¾è¡¨ï¼š1->2->3->4->5
-         * å½“ k = 2 æ—¶ï¼Œåº”å½“è¿”å›ž: 2->1->4->3->5
-         * å½“ k = 3 æ—¶ï¼Œåº”å½“è¿”å›ž: 3->2->1->4->5
-         * å½“ k = 4 æ—¶ï¼Œåº”å½“è¿”å›ž: 4->3->2->1->5
-         * å½“ k = 5 æ—¶ï¼Œåº”å½“è¿”å›ž: 5->4->3->2->1
-         * å½“ k = 6 æ—¶ï¼Œåº”å½“è¿”å›ž: 1->2->3->4->5
+         * ¸ø¶¨Õâ¸öÁ´±í£º1->2->3->4->5
+         * µ± k = 2 Ê±£¬Ó¦µ±·µ»Ø: 2->1->4->3->5
+         * µ± k = 3 Ê±£¬Ó¦µ±·µ»Ø: 3->2->1->4->5
+         * µ± k = 4 Ê±£¬Ó¦µ±·µ»Ø: 4->3->2->1->5
+         * µ± k = 5 Ê±£¬Ó¦µ±·µ»Ø: 5->4->3->2->1
+         * µ± k = 6 Ê±£¬Ó¦µ±·µ»Ø: 1->2->3->4->5
          */
 
         for (int i = 0; i <= 6; i++) {
@@ -276,8 +313,8 @@ public class CodingInterviewGuide {
     }
 
     /**
-     * è¶Šå°‘çš„å˜é‡, è¶Šå®¹æ˜“ç®¡æŽ§, less is more
-     * è‹¥ä¸€ä¸ªå˜é‡å¯ä»¥ä»£æ›¿å¦ä¸€ä¸ªå˜é‡, åˆ™ä¸è¦å¤šå£°æ˜Žä¸€ä¸ªå˜é‡; é™¤éž2ä¸ªå˜é‡æœ‰æ˜Žç¡®çš„ä¸åŒèŒè´£, å¦‚: æŒ‡é’ˆp1/p2
+     * Ô½ÉÙµÄ±äÁ¿, Ô½ÈÝÒ×¹Ü¿Ø, less is more
+     * ÈôÒ»¸ö±äÁ¿¿ÉÒÔ´úÌæÁíÒ»¸ö±äÁ¿, Ôò²»Òª¶àÉùÃ÷Ò»¸ö±äÁ¿; ³ý·Ç2¸ö±äÁ¿ÓÐÃ÷È·µÄ²»Í¬Ö°Ôð, Èç: Ö¸Õëp1/p2
      */
     public static RandomLinkedNode clone(RandomLinkedNode head) {
         if (head == null) {
@@ -421,8 +458,8 @@ public class CodingInterviewGuide {
     }
 
     public static TreeNode bst2DequeIterative(TreeNode root) {
-        // æš‚æ— æ€è·¯....
-        // å€Ÿç”¨é˜Ÿåˆ—, å†ä¸­åºéåŽ†, ä½†ä¸­åºéåŽ†ä¹Ÿç”¨åˆ°äº†é€’å½’....æ‰€ä»¥æœ‰æ²¡æœ‰é€’å½’çš„ä¸­åºéåŽ†ä¸”ä¿ç•™è·¯å¾„? åº”è¯¥æ˜¯æœ‰çš„, ä½†æ˜¯å¥½ç»•....
+        // ÔÝÎÞË¼Â·....
+        // ½èÓÃ¶ÓÁÐ, ÔÙÖÐÐò±éÀú, µ«ÖÐÐò±éÀúÒ²ÓÃµ½ÁËµÝ¹é....ËùÒÔÓÐÃ»ÓÐµÝ¹éµÄÖÐÐò±éÀúÇÒ±£ÁôÂ·¾¶? Ó¦¸ÃÊÇÓÐµÄ, µ«ÊÇºÃÈÆ....
         return null;
     }
 
@@ -480,7 +517,7 @@ public class CodingInterviewGuide {
         LinkedNode pre = head;
         LinkedNode cur = head.next;
         while (cur != null) {
-            // #==> æ­¤å¤„åˆ¤æ–­ä¾æ®ä¸ºcur
+            // #==> ´Ë´¦ÅÐ¶ÏÒÀ¾ÝÎªcur
             if (cur.val < small.val) {
                 smallPre = pre;
                 small = cur;
@@ -508,7 +545,7 @@ public class CodingInterviewGuide {
         p1.next = null;
         LinkedNode left = head;
 
-        // #==> æ­¤å¤„åˆ¤æ–­ä¾æ®ä¸ºnext
+        // #==> ´Ë´¦ÅÐ¶ÏÒÀ¾ÝÎªnext
         while (left.next != null) {
             LinkedNode ln = left.next;
             LinkedNode rn = right.next;
@@ -545,14 +582,14 @@ public class CodingInterviewGuide {
 
         if (node.right != null) {
             node = node.right;
-            // #==> æ­¤å¤„åˆ¤æ–­ä¾æ®ä¸ºleft
+            // #==> ´Ë´¦ÅÐ¶ÏÒÀ¾ÝÎªleft
             while (node.left != null) {
                 node = node.left;
             }
             return node;
         } else {
             TreeNode parent;
-            // #==> æ­¤å¤„åˆ¤æ–­ä¾æ®ä¸ºparent
+            // #==> ´Ë´¦ÅÐ¶ÏÒÀ¾ÝÎªparent
             while ((parent = node.parent) != null) {
                 if (parent.left == node) {
                     return parent;
@@ -611,12 +648,12 @@ public class CodingInterviewGuide {
         LinkedNode pre = null;
         while (cur1 != null && cur2 != null) {
             if (cur1.val < cur2.val) {
-                // ç¬¬1æ­¥è‚¯å®šæ˜¯èµ°åˆ°è¿™é‡Œ, æ‰€ä»¥å¯ä»¥ä¿è¯elseä¸­çš„preä¸ä¸ºnull, æ‰€ä»¥æ™ºèƒ½æç¤ºæœ‰æ—¶å€™ä¹Ÿæ²¡é‚£ä¹ˆæ™ºèƒ½!!
+                // µÚ1²½¿Ï¶¨ÊÇ×ßµ½ÕâÀï, ËùÒÔ¿ÉÒÔ±£Ö¤elseÖÐµÄpre²»Îªnull, ËùÒÔÖÇÄÜÌáÊ¾ÓÐÊ±ºòÒ²Ã»ÄÇÃ´ÖÇÄÜ!!
                 pre = cur1;
                 cur1 = cur1.next;
             } else {
                 LinkedNode next = cur2.next;
-                // å…³äºŽæ­¤å¤„waringæç¤º, ä¸Šè¿°æœ‰è¯´æ˜Ž
+                // ¹ØÓÚ´Ë´¦waringÌáÊ¾, ÉÏÊöÓÐËµÃ÷
                 pre.next = cur2;
                 cur2.next = cur1;
                 pre = cur2;
@@ -797,7 +834,7 @@ public class CodingInterviewGuide {
             LinkedNode cur2 = h2;
             int n = 0;
 
-            // WARNING! åˆ¤æ–­ç»“æŸçš„æ¡ä»¶ä¸æ˜¯null, è€Œæ˜¯e1æˆ–e2, ä¸ç„¶å°±ä¼šæ— é™æ­»å¾ªçŽ¯äº†....
+            // WARNING! ÅÐ¶Ï½áÊøµÄÌõ¼þ²»ÊÇnull, ¶øÊÇe1»òe2, ²»È»¾Í»áÎÞÏÞËÀÑ­»·ÁË....
             while (cur1.next != e1) {
                 n++;
                 cur1 = cur1.next;
@@ -1100,7 +1137,7 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== offer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
-    // TODO 1. è¿­ä»£çš„åŠ å…¥stackä¸­  2. å°†è¿˜æœ‰parentçš„treeNodeå˜æˆåŒå‘é˜Ÿåˆ—
+    // TODO 1. µü´úµÄ¼ÓÈëstackÖÐ  2. ½«»¹ÓÐparentµÄtreeNode±ä³ÉË«Ïò¶ÓÁÐ
     static class TreeNode {
         int val;
         TreeNode left;
@@ -1281,7 +1318,7 @@ public class CodingInterviewGuide {
 
 
     public static class Str2Int {
-        static int status;  // 0:æ­£å¸¸ -1:éžæ³•è¾“å…¥
+        static int status;  // 0:Õý³£ -1:·Ç·¨ÊäÈë
 
         public static int str2Int(String s) {
             status = -1;
@@ -1550,16 +1587,16 @@ public class CodingInterviewGuide {
 
 
     /**
-     * 1å’Œ0è½¬æ¢
-     * è¾“å…¥åªèƒ½æ˜¯1æˆ–0: 1->0, 0->1
+     * 1ºÍ0×ª»»
+     * ÊäÈëÖ»ÄÜÊÇ1»ò0: 1->0, 0->1
      */
     public static int flip(int n) {
         return n ^ 1;
     }
 
     /**
-     * n >= 0æ—¶, è¿”å›ž1
-     * n < 0æ—¶, è¿”å›ž0
+     * n >= 0Ê±, ·µ»Ø1
+     * n < 0Ê±, ·µ»Ø0
      */
     public static int sign(int n) {
         return flip((n >> 31) & 1);
