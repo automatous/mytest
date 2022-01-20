@@ -173,6 +173,47 @@ public class CodingInterviewGuide {
 
     // ====================================================================
 
+
+    public static LinkedNode reverseKNodeAgain(LinkedNode head, int k) {
+        if (k < 2 || head == null || head.next == null) {
+            return head;
+        }
+
+        LinkedNode cur = head;
+        LinkedNode pre = null;
+        LinkedNode start = null;
+        int i = 0;
+        while (cur != null) {
+            i++;
+            LinkedNode next = cur.next;
+            if (i == k) {
+                start = pre == null ? head : pre.next;
+                head = pre == null ? cur : head;
+                reverseAgain(pre, start, cur, next);
+                pre = start;
+                i = 0;
+            }
+            cur = next;
+        }
+        return head;
+    }
+
+    public static void reverseAgain(LinkedNode left, LinkedNode start, LinkedNode end, LinkedNode right) {
+        LinkedNode pre = start;
+        LinkedNode cur = start.next;
+        while (cur != right) {
+            LinkedNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        if (left != null) {
+            left.next = end;
+        }
+        start.next = right;
+    }
+
+
     public static LinkedNode reverseKNode(LinkedNode head, int k) {
         if (k < 2 || head == null || head.next == null) {
             return head;
@@ -218,22 +259,47 @@ public class CodingInterviewGuide {
     @Test
     public void testReverseKNode() {
         /*
-         * ∏¯∂®’‚∏ˆ¡¥±Ì£∫1->2->3->4->5
-         * µ± k = 2  ±£¨”¶µ±∑µªÿ: 2->1->4->3->5
-         * µ± k = 3  ±£¨”¶µ±∑µªÿ: 3->2->1->4->5
-         * µ± k = 4  ±£¨”¶µ±∑µªÿ: 4->3->2->1->5
-         * µ± k = 5  ±£¨”¶µ±∑µªÿ: 5->4->3->2->1
-         * µ± k = 6  ±£¨”¶µ±∑µªÿ: 1->2->3->4->5
+         * ÁªôÂÆöËøô‰∏™ÈìæË°®Ôºö1->2->3->4->5
+         * ÂΩì k = 2 Êó∂ÔºåÂ∫îÂΩìËøîÂõû: 2->1->4->3->5
+         * ÂΩì k = 3 Êó∂ÔºåÂ∫îÂΩìËøîÂõû: 3->2->1->4->5
+         * ÂΩì k = 4 Êó∂ÔºåÂ∫îÂΩìËøîÂõû: 4->3->2->1->5
+         * ÂΩì k = 5 Êó∂ÔºåÂ∫îÂΩìËøîÂõû: 5->4->3->2->1
+         * ÂΩì k = 6 Êó∂ÔºåÂ∫îÂΩìËøîÂõû: 1->2->3->4->5
          */
 
         for (int i = 0; i <= 6; i++) {
             LinkedNode head = new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5)))));
-            LinkedNode newHead = reverseKNode(head, i);
+//            LinkedNode newHead = reverseKNode(head, i);
+            LinkedNode newHead = reverseKNodeAgain(head, i);
             System.out.println(newHead);
         }
     }
 
     // =========================================================================
+
+    public static TreeNode bstConvertDequeAgain(TreeNode root) {
+        TreeNode[] pre = new TreeNode[1];
+        TreeNode[] head = new TreeNode[1];
+        doBstConvertDequeAgain(root, pre, head);
+        return head[0];
+    }
+
+    public static void doBstConvertDequeAgain(TreeNode root, TreeNode[] pre, TreeNode[] head) {
+        if (root == null) {
+            return;
+        }
+
+        doBstConvertDequeAgain(root.left, pre, head);
+        if (pre[0] != null) {
+            pre[0].right = root;
+        }
+        root.left = pre[0];
+        pre[0] = root;
+        if (head[0] == null) {
+            head[0] = root;
+        }
+        doBstConvertDequeAgain(root.right, pre, head);
+    }
 
     public static TreeNode bstConvertDeque(TreeNode root) {
         TreeNode[] head = new TreeNode[1];
@@ -278,7 +344,9 @@ public class CodingInterviewGuide {
 
 
         inOrderPrint(root);
-        TreeNode head = bstConvertDeque(root);
+        System.out.println("===================================================");
+//        TreeNode head = bstConvertDeque(root);
+        TreeNode head = bstConvertDequeAgain(root);
         System.out.println(head);
     }
 
@@ -312,9 +380,43 @@ public class CodingInterviewGuide {
         }
     }
 
+
+    public static RandomLinkedNode cloneAgain(RandomLinkedNode head) {
+        if (head == null) {
+            return null;
+        }
+
+        RandomLinkedNode cur = head;
+        while (cur != null) {
+            RandomLinkedNode clone = new RandomLinkedNode(cur.val);
+            clone.next = cur.next;
+            cur.next = clone;
+            cur = clone.next;
+        }
+
+        cur = head;
+        while (cur != null) {
+            RandomLinkedNode random = cur.random;
+            if (random != null) {
+                cur.next.random = random.next;
+            }
+            cur = cur.next.next;
+        }
+
+        cur = head;
+        RandomLinkedNode newHead = head.next;
+        while (cur.next != null) {
+            RandomLinkedNode next = cur.next;
+            cur.next = next.next;
+            cur = next;
+        }
+
+        return newHead;
+    }
+
     /**
-     * ‘Ω…Ÿµƒ±‰¡ø, ‘Ω»›“◊π‹øÿ, less is more
-     * »Ù“ª∏ˆ±‰¡øø…“‘¥˙ÃÊ¡Ì“ª∏ˆ±‰¡ø, ‘Ú≤ª“™∂‡…˘√˜“ª∏ˆ±‰¡ø; ≥˝∑«2∏ˆ±‰¡ø”–√˜»∑µƒ≤ªÕ¨÷∞‘, »Á: ÷∏’Îp1/p2
+     * Ë∂äÂ∞ëÁöÑÂèòÈáè, Ë∂äÂÆπÊòìÁÆ°Êéß, less is more
+     * Ëã•‰∏Ä‰∏™ÂèòÈáèÂèØ‰ª•‰ª£ÊõøÂè¶‰∏Ä‰∏™ÂèòÈáè, Âàô‰∏çË¶ÅÂ§öÂ£∞Êòé‰∏Ä‰∏™ÂèòÈáè; Èô§Èùû2‰∏™ÂèòÈáèÊúâÊòéÁ°ÆÁöÑ‰∏çÂêåËÅåË¥£, Â¶Ç: ÊåáÈíàp1/p2
      */
     public static RandomLinkedNode clone(RandomLinkedNode head) {
         if (head == null) {
@@ -358,11 +460,37 @@ public class CodingInterviewGuide {
         r3.random = r1;
         r4.random = r2;
 
-        RandomLinkedNode clone = clone(head);
+//        RandomLinkedNode clone = clone(head);
+        RandomLinkedNode clone = cloneAgain(head);
         System.out.println(clone);
     }
 
     // =============================================================================
+
+    public static List<TreeNode> findPathAgain(TreeNode root, int sum) {
+        List<TreeNode> path = new ArrayList<>();
+        List<TreeNode> ret = new ArrayList<>();
+        doFindPathAgain(root, sum, path, ret);
+        return ret;
+    }
+
+    private static void doFindPathAgain(TreeNode root, int sum, List<TreeNode> path, List<TreeNode> ret) {
+        if (root == null) {
+            return;
+        }
+
+        path.add(root);
+        sum -= root.val;
+        if (sum == 0) {
+            ret.addAll(path);
+            return;
+        }
+
+        doFindPathAgain(root.left, sum, path, ret);
+        doFindPathAgain(root.right, sum, path, ret);
+        path.remove(path.size() - 1);
+    }
+
 
     public static List<TreeNode> findPath(TreeNode root, int sum) {
         List<TreeNode> path = new ArrayList<>();
@@ -413,13 +541,22 @@ public class CodingInterviewGuide {
                                 null)));
 
         inOrderPrint(root);
+        System.out.println("=============================================");
 
-        System.out.println(findPath(root, 17)); // 7 -> 4 -> 6
-        System.out.println(findPath(root, 14)); // 7 -> 4 -> 2 -> 1
-        System.out.println(findPath(root, 22)); // 7 -> 4 -> 6 -> 5
-        System.out.println(findPath(root, 37)); // 7 -> 9 -> 11 -> 10
-        System.out.println(findPath(root, 24)); // 7 -> 9 -> 8
-        System.out.println(findPath(root, 40)); // []
+//        System.out.println(findPath(root, 17)); // 7 -> 4 -> 6
+//        System.out.println(findPath(root, 14)); // 7 -> 4 -> 2 -> 1
+//        System.out.println(findPath(root, 22)); // 7 -> 4 -> 6 -> 5
+//        System.out.println(findPath(root, 37)); // 7 -> 9 -> 11 -> 10
+//        System.out.println(findPath(root, 24)); // 7 -> 9 -> 8
+//        System.out.println(findPath(root, 40)); // []
+
+
+        System.out.println(findPathAgain(root, 17)); // 7 -> 4 -> 6
+        System.out.println(findPathAgain(root, 14)); // 7 -> 4 -> 2 -> 1
+        System.out.println(findPathAgain(root, 22)); // 7 -> 4 -> 6 -> 5
+        System.out.println(findPathAgain(root, 37)); // 7 -> 9 -> 11 -> 10
+        System.out.println(findPathAgain(root, 24)); // 7 -> 9 -> 8
+        System.out.println(findPathAgain(root, 40)); // []
     }
 
 
@@ -458,8 +595,8 @@ public class CodingInterviewGuide {
     }
 
     public static TreeNode bst2DequeIterative(TreeNode root) {
-        // ‘›ŒﬁÀº¬∑....
-        // ΩË”√∂”¡–, ‘Ÿ÷––Ú±È¿˙, µ´÷––Ú±È¿˙“≤”√µΩ¡Àµ›πÈ....À˘“‘”–√ª”–µ›πÈµƒ÷––Ú±È¿˙«“±£¡Ù¬∑æ∂? ”¶∏√ «”–µƒ, µ´ «∫√»∆....
+        // ÊöÇÊó†ÊÄùË∑Ø....
+        // ÂÄüÁî®ÈòüÂàó, ÂÜç‰∏≠Â∫èÈÅçÂéÜ, ‰ΩÜ‰∏≠Â∫èÈÅçÂéÜ‰πüÁî®Âà∞‰∫ÜÈÄíÂΩí....ÊâÄ‰ª•ÊúâÊ≤°ÊúâÈÄíÂΩíÁöÑ‰∏≠Â∫èÈÅçÂéÜ‰∏î‰øùÁïôË∑ØÂæÑ? Â∫îËØ•ÊòØÊúâÁöÑ, ‰ΩÜÊòØÂ•ΩÁªï....
         return null;
     }
 
@@ -517,7 +654,7 @@ public class CodingInterviewGuide {
         LinkedNode pre = head;
         LinkedNode cur = head.next;
         while (cur != null) {
-            // #==> ¥À¥¶≈–∂œ“¿æ›Œ™cur
+            // #==> Ê≠§Â§ÑÂà§Êñ≠‰æùÊçÆ‰∏∫cur
             if (cur.val < small.val) {
                 smallPre = pre;
                 small = cur;
@@ -545,7 +682,7 @@ public class CodingInterviewGuide {
         p1.next = null;
         LinkedNode left = head;
 
-        // #==> ¥À¥¶≈–∂œ“¿æ›Œ™next
+        // #==> Ê≠§Â§ÑÂà§Êñ≠‰æùÊçÆ‰∏∫next
         while (left.next != null) {
             LinkedNode ln = left.next;
             LinkedNode rn = right.next;
@@ -582,14 +719,14 @@ public class CodingInterviewGuide {
 
         if (node.right != null) {
             node = node.right;
-            // #==> ¥À¥¶≈–∂œ“¿æ›Œ™left
+            // #==> Ê≠§Â§ÑÂà§Êñ≠‰æùÊçÆ‰∏∫left
             while (node.left != null) {
                 node = node.left;
             }
             return node;
         } else {
             TreeNode parent;
-            // #==> ¥À¥¶≈–∂œ“¿æ›Œ™parent
+            // #==> Ê≠§Â§ÑÂà§Êñ≠‰æùÊçÆ‰∏∫parent
             while ((parent = node.parent) != null) {
                 if (parent.left == node) {
                     return parent;
@@ -648,12 +785,12 @@ public class CodingInterviewGuide {
         LinkedNode pre = null;
         while (cur1 != null && cur2 != null) {
             if (cur1.val < cur2.val) {
-                // µ⁄1≤Ωøœ∂® «◊ﬂµΩ’‚¿Ô, À˘“‘ø…“‘±£÷§else÷–µƒpre≤ªŒ™null, À˘“‘÷«ƒ‹Ã· æ”– ±∫Ú“≤√ªƒ«√¥÷«ƒ‹!!
+                // Á¨¨1Ê≠•ËÇØÂÆöÊòØËµ∞Âà∞ËøôÈáå, ÊâÄ‰ª•ÂèØ‰ª•‰øùËØÅelse‰∏≠ÁöÑpre‰∏ç‰∏∫null, ÊâÄ‰ª•Êô∫ËÉΩÊèêÁ§∫ÊúâÊó∂ÂÄô‰πüÊ≤°ÈÇ£‰πàÊô∫ËÉΩ!!
                 pre = cur1;
                 cur1 = cur1.next;
             } else {
                 LinkedNode next = cur2.next;
-                // πÿ”⁄¥À¥¶waringÃ· æ, …œ ˆ”–Àµ√˜
+                // ÂÖ≥‰∫éÊ≠§Â§ÑwaringÊèêÁ§∫, ‰∏äËø∞ÊúâËØ¥Êòé
                 pre.next = cur2;
                 cur2.next = cur1;
                 pre = cur2;
@@ -824,6 +961,50 @@ public class CodingInterviewGuide {
         System.out.println(intersectNode);
     }
 
+    public static LinkedNode bothLoopFirstCommonNodeAgain(LinkedNode h1, LinkedNode e1, LinkedNode h2, LinkedNode e2) {
+        if (h1 == null || e1 == null || h2 == null || e2 == null) {
+            return null;
+        }
+
+        if (e1 == e2) {
+            LinkedNode cur1 = h1;
+            LinkedNode cur2 = h1;
+            int n = 0;
+            while (cur1 != e1) {
+                n++;
+                cur1 = cur1.next;
+            }
+            while (cur2 != e2) {
+                n--;
+                cur2 = cur2.next;
+            }
+
+            cur1 = n > 0 ? h1 : h2;
+            cur2 = cur1 == h1 ? h2 : h1;
+            n = Math.abs(n);
+            while (n != 0) {
+                n--;
+                cur1 = cur1.next;
+            }
+
+            while (cur1 != cur2) {
+                cur1 = cur1.next;
+                cur2 = cur2.next;
+            }
+            return cur1;
+        } else {
+            LinkedNode cur1 = e1.next;
+            while (cur1 != e1) {
+                if (cur1 == e2) {
+                    return e1;
+                }
+                cur1 = cur1.next;
+            }
+            return null;
+        }
+
+    }
+
     public static LinkedNode bothLoopFirstCommonNode(LinkedNode h1, LinkedNode e1, LinkedNode h2, LinkedNode e2) {
         if (h1 == null || e1 == null || h2 == null || e2 == null) {
             return null;
@@ -834,7 +1015,7 @@ public class CodingInterviewGuide {
             LinkedNode cur2 = h2;
             int n = 0;
 
-            // WARNING! ≈–∂œΩ· ¯µƒÃıº˛≤ª «null, ∂¯ «e1ªÚe2, ≤ª»ªæÕª·ŒﬁœﬁÀ¿—≠ª∑¡À....
+            // WARNING! Âà§Êñ≠ÁªìÊùüÁöÑÊù°‰ª∂‰∏çÊòØnull, ËÄåÊòØe1Êàñe2, ‰∏çÁÑ∂Â∞±‰ºöÊó†ÈôêÊ≠ªÂæ™ÁéØ‰∫Ü....
             while (cur1.next != e1) {
                 n++;
                 cur1 = cur1.next;
@@ -887,10 +1068,52 @@ public class CodingInterviewGuide {
 
         LinkedNode e1 = getLoopLinkedNode(h1);
         LinkedNode e2 = getLoopLinkedNode(h2);
-        LinkedNode commonNode = bothLoopFirstCommonNode(h1, e1, h2, e2);
+//        LinkedNode commonNode = bothLoopFirstCommonNode(h1, e1, h2, e2);
+        LinkedNode commonNode = bothLoopFirstCommonNodeAgain(h1, e1, h2, e2);
         System.out.println(commonNode);
     }
 
+
+    public static LinkedNode noLoopFirstCommonNodeAgain(LinkedNode h1, LinkedNode h2) {
+        if (h1 == null || h2 == null) {
+            return null;
+        }
+
+        LinkedNode cur1 = h1;
+        LinkedNode cur2 = h2;
+        // ÁâπÂà´Ë¶ÅÊ≥®ÊÑèn‰∏écurÁöÑÂØπÂ∫îÂÖ≥Á≥ª, ‰∏çÁÑ∂ÂæàÊúâÂèØËÉΩ‰ºöÂØºËá¥Ê≠ªÂæ™ÁéØÊàñnullPointerException! ÊâÄ‰ª•Êô∫ËÉΩÊèêÁ§∫ËøòÊòØÊúâÈÇ£‰πàÁÇπÁÇπÈÅìÁêÜÁöÑ
+        int n = 0;
+
+        while (cur1.next != null) {
+            n++;
+            cur1 = cur1.next;
+        }
+
+        while (cur2.next != null) {
+            n--;
+            cur2 = cur2.next;
+        }
+
+        if (cur1 != cur2) {
+            return null;
+        }
+
+        cur1 = n > 0 ? h1 : h2;
+        cur2 = cur1 == h1 ? h2 : h1;
+        n = Math.abs(n);
+
+        while (n != 0) {
+            n--;
+            cur1 = cur1.next;   // ÁâπÂà´Ë¶ÅÊ≥®ÊÑèn‰∏écurÁöÑÂØπÂ∫îÂÖ≥Á≥ª, ‰∏çÁÑ∂ÂæàÊúâÂèØËÉΩ‰ºöÂØºËá¥Ê≠ªÂæ™ÁéØÊàñnullPointerException! ÊâÄ‰ª•Êô∫ËÉΩÊèêÁ§∫ËøòÊòØÊúâÈÇ£‰πàÁÇπÁÇπÈÅìÁêÜÁöÑ
+        }
+
+        while (cur1 != cur2) {
+            cur1 = cur1.next;
+            cur2 = cur2.next;
+        }
+
+        return cur1;
+    }
 
     public static LinkedNode noLoopFirstCommonNode(LinkedNode h1, LinkedNode h2) {
         if (h1 == null || h2 == null) {
@@ -935,13 +1158,14 @@ public class CodingInterviewGuide {
         LinkedNode h1 = new LinkedNode(1, new LinkedNode(2, n1 = new LinkedNode(3)));
         LinkedNode h2 = new LinkedNode(0, new LinkedNode(1, new LinkedNode(2, new LinkedNode(3,
                 n2 = new LinkedNode(4, new LinkedNode(5, new LinkedNode(6, new LinkedNode(7))))))));
-//        n1.next = n2;
-        LinkedNode commonNode = noLoopFirstCommonNode(h1, h2);
+        n1.next = n2;
+//        LinkedNode commonNode = noLoopFirstCommonNode(h1, h2);
+        LinkedNode commonNode = noLoopFirstCommonNodeAgain(h1, h2);
         System.out.println(commonNode);
     }
 
 
-    public static LinkedNode getLoopLinkedNode(LinkedNode head) {
+    public static LinkedNode getLoopNodeAgain(LinkedNode head) {
         if (head == null || head.next == null) {
             return null;
         }
@@ -967,6 +1191,31 @@ public class CodingInterviewGuide {
     }
 
 
+    public static LinkedNode getLoopLinkedNode(LinkedNode head) {
+        if (head == null || head.next == null || head.next.next == null) {
+            return null;
+        }
+
+        LinkedNode p1 = head.next;
+        LinkedNode p2 = head.next.next;
+        while (p1 != p2) {
+            if (p2 == null || p2.next == null) {
+                return null;
+            }
+            p1 = p1.next;
+            p2 = p2.next.next;
+        }
+
+        p2 = head;
+        while (p1 != p2) {
+            p1 = p1.next;
+            p2 = p2.next;
+        }
+
+        return p1;
+    }
+
+
     @Test
     public void testGetLoopLinkedNode() {
         LinkedNode n1, n2;
@@ -974,7 +1223,8 @@ public class CodingInterviewGuide {
                 n1 = new LinkedNode(4, new LinkedNode(5, new LinkedNode(6,
                         n2 = new LinkedNode(7))))))));
 //        n2.next = n1;
-        LinkedNode loopEntryNode = getLoopLinkedNode(head);
+//        LinkedNode loopEntryNode = getLoopLinkedNode(head);
+        LinkedNode loopEntryNode = getLoopNodeAgain(head);
         System.out.println(loopEntryNode);
     }
 
@@ -1137,7 +1387,7 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== offer =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
-    // TODO 1. µ¸¥˙µƒº”»Îstack÷–  2. Ω´ªπ”–parentµƒtreeNode±‰≥…À´œÚ∂”¡–
+    // TODO 1. Ëø≠‰ª£ÁöÑÂä†ÂÖ•stack‰∏≠  2. Â∞ÜËøòÊúâparentÁöÑtreeNodeÂèòÊàêÂèåÂêëÈòüÂàó
     static class TreeNode {
         int val;
         TreeNode left;
@@ -1318,7 +1568,7 @@ public class CodingInterviewGuide {
 
 
     public static class Str2Int {
-        static int status;  // 0:’˝≥£ -1:∑«∑® ‰»Î
+        static int status;  // 0:Ê≠£Â∏∏ -1:ÈùûÊ≥ïËæìÂÖ•
 
         public static int str2Int(String s) {
             status = -1;
@@ -1587,16 +1837,16 @@ public class CodingInterviewGuide {
 
 
     /**
-     * 1∫Õ0◊™ªª
-     *  ‰»Î÷ªƒ‹ «1ªÚ0: 1->0, 0->1
+     * 1Âíå0ËΩ¨Êç¢
+     * ËæìÂÖ•Âè™ËÉΩÊòØ1Êàñ0: 1->0, 0->1
      */
     public static int flip(int n) {
         return n ^ 1;
     }
 
     /**
-     * n >= 0 ±, ∑µªÿ1
-     * n < 0 ±, ∑µªÿ0
+     * n >= 0Êó∂, ËøîÂõû1
+     * n < 0Êó∂, ËøîÂõû0
      */
     public static int sign(int n) {
         return flip((n >> 31) & 1);
