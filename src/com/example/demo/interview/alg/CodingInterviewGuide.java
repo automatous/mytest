@@ -1908,6 +1908,33 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== dp =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+
+    public static int leastSumAgain(int[][] m) {
+        if (m == null || m.length == 0 || m[0] == null || m[0].length == 0) {
+            return 0;
+        }
+
+        int rows = m.length;
+        int cols = m[0].length;
+        int[][] dp = new int[rows][cols];
+
+        dp[0][0] = m[0][0];
+        for (int i = 1; i < cols; i++) {
+            dp[0][i] = dp[0][i - 1] + m[0][i];
+        }
+        for (int i = 1; i < rows; i++) {
+            dp[i][0] = dp[i - 1][0] + m[i][0];
+        }
+
+        for (int i = 1; i < rows; i++) {
+            for (int j = 1; j < cols; j++) {
+                dp[i][j] = Math.min(dp[i][j - 1], dp[i - 1][j]) + m[i][j];
+            }
+        }
+
+        return dp[rows - 1][cols - 1];
+    }
+
     public static int leastSum(int[][] matrix) {
         if (matrix == null || matrix.length == 0 || matrix[0] == null || matrix[0].length == 0) {
             return 0;
@@ -1931,6 +1958,35 @@ public class CodingInterviewGuide {
         }
 
         return dp[rows - 1][cols - 1];
+    }
+
+
+    public static int leastSumPlusAgain(int[][] m) {
+        if (m == null || m.length == 0 || m[0] == null || m[0].length == 0) {
+            return 0;
+        }
+
+        int rows = m.length;
+        int cols = m[0].length;
+        int min = Math.min(rows, cols);
+        int max = Math.max(rows, cols);
+        boolean isRows = rows < cols;
+
+        int[] dp = new int[min];
+        dp[0] = m[0][0];
+
+        for (int i = 1; i < min; i++) {
+            dp[i] = dp[i - 1] + (isRows ? m[0][i] : m[i][0]);
+        }
+
+        for (int i = 1; i < max; i++) {
+            dp[0] = dp[0] + (isRows ? m[i][0] : m[0][i]);
+            for (int j = 1; j < min; j++) {
+                dp[j] = Math.min(dp[j - 1], dp[j]) + (isRows ? m[i][j] : m[j][i]);
+            }
+        }
+
+        return dp[min - 1];
     }
 
     public static int leastSumPlus(int[][] matrix) {
@@ -1969,11 +2025,31 @@ public class CodingInterviewGuide {
                 {8, 8, 4, 0}
         };
 
-        System.out.println(leastSum(matrix));
-        System.out.println(leastSumPlus(matrix));
+//        System.out.println(leastSum(matrix));
+//        System.out.println(leastSumPlus(matrix));
+
+//        System.out.println(leastSumAgain(matrix));
+        System.out.println(leastSumPlusAgain(matrix));
     }
 
     // ===============================================================================================
+
+    public static int walkAgain(int N, int M, int K, int P) {
+        if (K == 0) {
+            return M == P ? 1 : 0;
+        }
+
+        K--;
+        if (M == N) {
+            return walkAgain(N, N - 1, K, P);
+        } else if (M == 1) {
+            return walkAgain(N, 2, K, P);
+        } else {
+            int left = walkAgain(N, M - 1, K, P);
+            int right = walkAgain(N, M + 1, K, P);
+            return left + right;
+        }
+    }
 
     public static int walk(int N, int cur, int rest, int p) {
         if (rest == 0) {
@@ -1987,6 +2063,55 @@ public class CodingInterviewGuide {
         } else {
             return walk(N, cur + 1, rest - 1, p) + walk(N, cur - 1, rest - 1, p);
         }
+    }
+
+
+    public static int walk1Again(int N, int M, int K, int P) {
+        if (N < 2 || M < 1 || M > N || K < 1 || P < 1 || P > N) {
+            return 0;
+        }
+
+        int[][] dp = new int[K + 1][N + 1];
+        dp[0][M] = 1;
+
+        for (int i = 1; i <= K; i++) {
+            for (int j = 1; j <= N; j++) {
+                if (j == 1) {
+                    dp[i][j] = dp[i - 1][2];
+                } else if (j == N) {
+                    dp[i][j] = dp[i - 1][N - 1];
+                } else {
+                    dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j + 1];
+                }
+            }
+        }
+
+        return dp[K][P];
+    }
+
+
+    // TODO
+    public static int walk2Again(int N, int M, int K, int P) {
+        if (N < 2 || M < 1 || M > N || K < 1 || P < 1 || P > N) {
+            return 0;
+        }
+
+        int[] dp = new int[N + 1];
+        dp[M] = 1;
+        int leftUp = 0;
+        for (int i = 1; i <= K; i++) {
+            int cur = dp[i];
+            if (i == 1) {
+                dp[i] = dp[2];
+            } else if (i == N) {
+                dp[i] = dp[N - 1];
+            } else {
+                dp[i] = leftUp + dp[i + 1];
+            }
+            leftUp = cur;
+        }
+
+        return dp[P];
     }
 
     public static int ways1(int N, int cur, int rest, int p) {
@@ -2054,7 +2179,11 @@ public class CodingInterviewGuide {
         for (int[] a : aa) {
 //            int cnt = ways1(a[0], a[1], a[2], a[3]);
 //            int cnt = ways2(a[0], a[1], a[2], a[3]);
-            int cnt = ways3(a[0], a[1], a[2], a[3]);
+//            int cnt = ways3(a[0], a[1], a[2], a[3]);
+
+//            int cnt = walkAgain(a[0], a[1], a[2], a[3]);
+//            int cnt = walk1Again(a[0], a[1], a[2], a[3]);
+            int cnt = walk2Again(a[0], a[1], a[2], a[3]);
             System.out.println(cnt);
         }
     }
