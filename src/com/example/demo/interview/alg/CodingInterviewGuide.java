@@ -2090,7 +2090,6 @@ public class CodingInterviewGuide {
     }
 
 
-    // TODO
     public static int walk2Again(int N, int M, int K, int P) {
         if (N < 2 || M < 1 || M > N || K < 1 || P < 1 || P > N) {
             return 0;
@@ -2098,17 +2097,19 @@ public class CodingInterviewGuide {
 
         int[] dp = new int[N + 1];
         dp[M] = 1;
-        int leftUp = 0;
         for (int i = 1; i <= K; i++) {
-            int cur = dp[i];
-            if (i == 1) {
-                dp[i] = dp[2];
-            } else if (i == N) {
-                dp[i] = dp[N - 1];
-            } else {
-                dp[i] = leftUp + dp[i + 1];
+            int leftUp = dp[1];
+            for (int j = 1; j <= N; j++) {
+                int tmp = dp[j];
+                if (j == 1) {
+                    dp[j] = dp[2];
+                } else if (j == N) {
+                    dp[j] = leftUp;
+                } else {
+                    dp[j] = leftUp + dp[j + 1];
+                }
+                leftUp = tmp;
             }
-            leftUp = cur;
         }
 
         return dp[P];
