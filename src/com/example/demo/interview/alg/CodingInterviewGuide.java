@@ -1908,6 +1908,83 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== dp =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+    public static int changes(int[] a, int sum) {
+        if (a == null || a.length == 0 || sum < 0) {
+            return 0;
+        }
+
+        return changeProcess(a, 0, sum);
+    }
+
+    public static int changeProcess(int[] a, int i, int rest) {
+        if (i == a.length || rest == 0) {
+            return rest == 0 ? 1 : 0;
+        }
+
+        int res = 0;
+        for (int k = 0; k * a[i] <= rest; k++) {
+            res += changeProcess(a, i + 1, rest - k * a[i]);
+        }
+        return res;
+    }
+
+    @Test
+    public void testChanges() {
+        int[][] coins = {
+                {5, 10, 25, 1},
+                {5, 10, 25, 1},
+                {3, 5}
+        };
+
+        int[] sums = {0, 15, 2};
+
+        for (int i = 0; i < coins.length; i++) {
+            int changes = changes(coins[i], sums[i]);
+            System.out.println(changes);
+        }
+    }
+
+
+    // =====================================================================
+
+    public static int minCoins(int[] a, int sum) {
+        if (a == null || a.length == 0 || sum < 0) {
+            return -1;
+        }
+        return process1(a, 0, sum);
+    }
+
+    public static int process1(int[] a, int i, int rest) {
+        if (rest == 0 || i == a.length) {
+            return rest == 0 ? 0 : -1;
+        }
+
+        int res = -1;
+        for (int k = 0; k * a[i] <= rest; k++) {
+            int next = process1(a, i + 1, rest - k * a[i]);
+            if (next != -1) {
+                res = res == -1 ? next + k : Math.min(res, next + k);
+            }
+        }
+        return res;
+    }
+
+    @Test
+    public void testMinCoin() {
+        int[][] coins = {
+                {5, 2, 3},
+                {3, 5}
+        };
+
+        int[] sums = {20, 2};
+
+        for (int i = 0; i < coins.length; i++) {
+            int minCoins = minCoins(coins[i], sums[i]);
+            System.out.println(minCoins);
+        }
+    }
+
+    // ===============================================================================
 
     public static int leastSumAgain(int[][] m) {
         if (m == null || m.length == 0 || m[0] == null || m[0].length == 0) {
