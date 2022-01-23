@@ -1925,7 +1925,31 @@ public class CodingInterviewGuide {
         for (int k = 0; k * a[i] <= rest; k++) {
             res += changeProcess(a, i + 1, rest - k * a[i]);
         }
+
         return res;
+    }
+
+
+    public static int changesPlus(int[] a, int sum) {
+        if (a == null || a.length == 0 || sum < 0) {
+            return 0;
+        }
+
+        int n = a.length;
+        int[][] dp = new int[n + 1][sum + 1];
+
+        dp[n][0] = 1;
+
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = 0; j <= sum; j++) {
+                dp[i][j] = dp[i + 1][j];
+                if (j - a[i] >= 0) {
+                    dp[i][j] += dp[i][j - a[i]];
+                }
+            }
+        }
+
+        return dp[0][sum];
     }
 
     @Test
@@ -1936,10 +1960,12 @@ public class CodingInterviewGuide {
                 {3, 5}
         };
 
-        int[] sums = {0, 15, 2};
+//        int[] sums = {0, 15, 2};    // 1, 6, 0
+        int[] sums = {0, 15, 7};    // 1, 6, 0
 
         for (int i = 0; i < coins.length; i++) {
             int changes = changes(coins[i], sums[i]);
+//            int changes = changesPlus(coins[i], sums[i]);
             System.out.println(changes);
         }
     }
@@ -1969,6 +1995,32 @@ public class CodingInterviewGuide {
         return res;
     }
 
+    public static int minCoinsPlus(int[] a, int sum) {
+        if (a == null || a.length == 0 || sum < 0) {
+            return -1;
+        }
+
+        int[][] dp = new int[a.length + 1][sum + 1];
+        for (int i = 1; i <= sum; i++) {
+            dp[a.length][i] = -1;
+        }
+
+        for (int i = a.length - 1; i >= 0; i--) {
+            for (int j = 0; j <= sum; j++) {
+                dp[i][j] = dp[i + 1][j];
+                if (j - a[i] >= 0 && dp[i][j - a[i]] != -1) {
+                    if (dp[i][j] == -1) {
+                        dp[i][j] = dp[i][j - a[i]] + 1;
+                    } else {
+                        dp[i][j] = Math.min(dp[i][j], dp[i][j - a[i]] + 1);
+                    }
+                }
+            }
+        }
+
+        return dp[0][sum];
+    }
+
     @Test
     public void testMinCoin() {
         int[][] coins = {
@@ -1976,10 +2028,11 @@ public class CodingInterviewGuide {
                 {3, 5}
         };
 
-        int[] sums = {20, 2};
+        int[] sums = {20, 2};   // 4, -1
 
         for (int i = 0; i < coins.length; i++) {
             int minCoins = minCoins(coins[i], sums[i]);
+//            int minCoins = minCoinsPlus(coins[i], sums[i]);
             System.out.println(minCoins);
         }
     }
