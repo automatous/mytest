@@ -1964,8 +1964,8 @@ public class CodingInterviewGuide {
         int[] sums = {0, 15, 7};    // 1, 6, 0
 
         for (int i = 0; i < coins.length; i++) {
-            int changes = changes(coins[i], sums[i]);
-//            int changes = changesPlus(coins[i], sums[i]);
+//            int changes = changes(coins[i], sums[i]);
+            int changes = changesPlus(coins[i], sums[i]);
             System.out.println(changes);
         }
     }
