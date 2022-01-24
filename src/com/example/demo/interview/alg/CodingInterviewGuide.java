@@ -1908,6 +1908,79 @@ public class CodingInterviewGuide {
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== dp =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
+
+    public static String longestCommonSubsequence(String s1, String s2) {
+        if (s1 == null || s1.length() == 0 || s2 == null || s2.length() == 0) {
+            if (s1 != null && s2 != null) {
+                return "";
+            }
+            return null;
+        }
+
+        char[] ca1 = s1.toCharArray();
+        char[] ca2 = s2.toCharArray();
+
+        int m = ca1.length;
+        int n = ca2.length;
+
+        int[][] dp = new int[m][n];
+        dp[0][0] = ca1[0] == ca2[0] ? 1 : 0;
+        for (int i = 1; i < m; i++) {
+            dp[i][0] = ca1[i] == ca2[0] ? 1 : dp[i - 1][0];
+        }
+        for (int i = 1; i < n; i++) {
+            dp[0][i] = ca1[0] == ca2[i] ? 1 : dp[0][i - 1];
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = Math.max(dp[i][j - 1], dp[i - 1][j]);
+                if (ca1[i] == ca2[j]) {
+                    dp[i][j] = Math.max(dp[i][j], dp[i - 1][j - 1] + 1);
+                }
+            }
+        }
+
+        int len = dp[m - 1][n - 1];
+        char[] arr = new char[len];
+        int i = m - 1, j = n - 1;
+        while (len > 0) {
+            if (i > 0 && dp[i][j] == dp[i - 1][j]) {
+                i--;
+            } else if (j > 0 && dp[i][j] == dp[i][j - 1]) {
+                j--;
+            } else {
+                arr[--len] = ca1[i];
+                i--;
+                j--;
+            }
+        }
+
+        return new String(arr);
+    }
+
+
+    @Test
+    public void testLongestCommonSubsequence() {
+        String[][] saa = {
+                {"1A2C3D4B56", "B1D23CA45B6A"}, // "123456" || "12C4B6"
+                {"", ""},                       // ""
+                {null, null},                   // null
+                {"", null}                      // null
+        };
+
+        for (String[] sa : saa) {
+            String ss = longestCommonSubsequence(sa[0], sa[1]);
+            System.out.println(ss);
+        }
+    }
+
+    public static String longestCommonSubstring(String s1, String s2) {
+        return null;
+    }
+
+    // ===================================================================================
+
     public static int changes(int[] a, int sum) {
         if (a == null || a.length == 0 || sum < 0) {
             return 0;
