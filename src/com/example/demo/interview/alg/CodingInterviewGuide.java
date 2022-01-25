@@ -2053,15 +2053,11 @@ public class CodingInterviewGuide {
         int j = n - 1;
         int i = 0;  // 从右上角往左下角的垂直对角线遍历
         while (i < m) {
-            int pre = 0;
-            if (ca1[i] == ca2[j]) {
-                pre = 1;
-            }
-
             int a = i, b = j;
+            int pre = 0;
             while (a < m && b < n) {
                 if (ca1[a] == ca2[b]) {
-                    pre += 1;
+                    pre++;
                     if (pre > len) {
                         len = pre;
                         idx = a;
@@ -2073,9 +2069,9 @@ public class CodingInterviewGuide {
                 b++;
             }
 
-            if (j > 0) {
+            if (j > 0) {    // 斜线开始位置的列先向左移动
                 j--;
-            } else {
+            } else {        // 列移动到最左边之后, 行向下移动
                 i++;
             }
         }
