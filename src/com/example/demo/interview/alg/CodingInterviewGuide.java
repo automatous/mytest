@@ -2032,6 +2032,57 @@ public class CodingInterviewGuide {
         return s1.substring(idx - len + 1, idx + 1);
     }
 
+
+    public static String longestCommonSubstringPlus(String s1, String s2) {
+        if (s1 == null || s1.length() == 0 || s2 == null || s2.length() == 0) {
+            if (s1 != null && s2 != null) {
+                return "";
+            }
+            return null;
+        }
+
+        char[] ca1 = s1.toCharArray();
+        char[] ca2 = s2.toCharArray();
+
+        int m = ca1.length;
+        int n = ca2.length;
+
+        int len = 0;
+        int idx = 0;
+
+        int j = n - 1;
+        int i = 0;  // 从右上角往左下角的垂直对角线遍历
+        while (i < m) {
+            int pre = 0;
+            if (ca1[i] == ca2[j]) {
+                pre = 1;
+            }
+
+            int a = i, b = j;
+            while (a < m && b < n) {
+                if (ca1[a] == ca2[b]) {
+                    pre += 1;
+                    if (pre > len) {
+                        len = pre;
+                        idx = a;
+                    }
+                } else {
+                    pre = 0;
+                }
+                a++;
+                b++;
+            }
+
+            if (j > 0) {
+                j--;
+            } else {
+                i++;
+            }
+        }
+
+        return s1.substring(idx - len + 1, idx + 1);
+    }
+
     @Test
     public void testLongestCommonSubstring() {
         String[][] saa = {
@@ -2042,7 +2093,8 @@ public class CodingInterviewGuide {
         };
 
         for (String[] sa : saa) {
-            String lcs = longestCommonSubstring(sa[0], sa[1]);
+//            String lcs = longestCommonSubstring(sa[0], sa[1]);
+            String lcs = longestCommonSubstringPlus(sa[0], sa[1]);
             System.out.println(lcs);
         }
     }
