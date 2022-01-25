@@ -1909,6 +1909,9 @@ public class CodingInterviewGuide {
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== dp =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
 
+    /**
+     * 最长公共子序列
+     */
     public static String longestCommonSubsequence(String s1, String s2) {
         if (s1 == null || s1.length() == 0 || s2 == null || s2.length() == 0) {
             if (s1 != null && s2 != null) {
@@ -1975,8 +1978,73 @@ public class CodingInterviewGuide {
         }
     }
 
+    /**
+     * 最长公共子串
+     */
     public static String longestCommonSubstring(String s1, String s2) {
-        return null;
+        if (s1 == null || s1.length() == 0 || s2 == null || s2.length() == 0) {
+            if (s1 != null && s2 != null) {
+                return "";
+            }
+            return null;
+        }
+
+        char[] ca1 = s1.toCharArray();
+        char[] ca2 = s2.toCharArray();
+        int m = ca1.length;
+        int n = ca2.length;
+
+        int[][] dp = new int[m][n];
+        dp[0][0] = ca1[0] == ca2[0] ? 1 : 0;
+
+        for (int i = 1; i < m; i++) {
+            if (ca1[i] == ca2[0]) {
+                dp[i][0] = 1;
+            }
+        }
+
+        for (int i = 1; i < n; i++) {
+            if (ca1[0] == ca2[i]) {
+                dp[0][i] = 1;
+            }
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (ca1[i] == ca2[j]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                }
+            }
+        }
+
+
+        int len = 0;
+        int idx = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (dp[i][j] > len) {
+                    len = dp[i][j];
+                    idx = i;
+                }
+            }
+        }
+
+        return s1.substring(idx - len + 1, idx + 1);
+    }
+
+    @Test
+    public void testLongestCommonSubstring() {
+        String[][] saa = {
+                {"1AB2345CD", "12345EF"},   // "2345"
+                {"", ""},                   // ""
+                {"", null},                 // null
+                {null, null}                // null
+        };
+
+        for (String[] sa : saa) {
+            String lcs = longestCommonSubstring(sa[0], sa[1]);
+            System.out.println(lcs);
+        }
     }
 
     // ===================================================================================
