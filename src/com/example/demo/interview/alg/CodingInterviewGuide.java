@@ -1910,6 +1910,16 @@ public class CodingInterviewGuide {
 
 
     /**
+     * 龙与地下城游戏问题
+     */
+
+    /**
+     * 字符串的交错组成
+     */
+
+    // ================================================================================
+
+    /**
      * 最长公共子序列
      */
     public static String longestCommonSubsequence(String s1, String s2) {
@@ -2512,6 +2522,58 @@ public class CodingInterviewGuide {
 
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== dfs/bfs =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
+
+    static class NestedInteger {
+        Integer val;
+        List<NestedInteger> list;
+
+        public NestedInteger(Integer val, List<NestedInteger> list) {
+            this.val = val;
+            this.list = list;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder s = new StringBuilder();
+            s.append("[");
+
+            // 最多只能有一个为null
+            if (val != null && list != null) {
+                s.append(val);
+                s.append(",");
+                for (int i = 0; i < list.size(); i++) {
+                    s.append(list.get(i));
+                    if (i != list.size() - 1) {
+                        s.append(",");
+                    }
+                }
+            } else if (val != null) {
+                s.append(val);
+            } else {
+                for (int i = 0; i < list.size(); i++) {
+                    s.append(list.get(i));
+                    if (i != list.size() - 1) {
+                        s.append(",");
+                    }
+                }
+            }
+
+            s.append("]");
+            return s.toString();
+        }
+    }
+
+    @Test
+    public void testNestedInteger() {
+        NestedInteger ni = new NestedInteger(2,
+                new ArrayList<>(Arrays.asList(
+                        new NestedInteger(null, new ArrayList<>(Arrays.asList(new NestedInteger(1, null), new NestedInteger(1, null)))),
+                        new NestedInteger(null, new ArrayList<>(Arrays.asList(new NestedInteger(1, null), new NestedInteger(1, null))))
+                )));
+
+        System.out.println(ni);
+    }
+
 
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== dfs/bfs =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 }
