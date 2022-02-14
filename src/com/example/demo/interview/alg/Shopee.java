@@ -1,6 +1,5 @@
 package com.example.demo.interview.alg;
 
-import com.example.demo.alg.LinkedNodeTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -1309,7 +1308,8 @@ public class Shopee {
      * 43. 数组-搜索插入位置
      */
     public static int searchInsertPosition(int[] a, int k) {
-        return partition(a, k, 0, a.length);
+//        return partition(a, k, 0, a.length);
+        return partitionPlus(a, k);
     }
 
     public static int partition(int[] a, int k, int l, int r) {
@@ -1324,6 +1324,21 @@ public class Shopee {
         } else {
             return m;
         }
+    }
+
+    public static int partitionPlus(int[] a, int k) {
+        int l = 0, r = a.length;
+        while (l < r) {
+            int m = l + (r - l) / 2;
+            if (a[m] > k) {
+                r = m;
+            } else if (a[m] < k) {
+                l = m + 1;
+            } else {
+                return m;
+            }
+        }
+        return r;
     }
 
     @Test
@@ -1519,21 +1534,21 @@ public class Shopee {
         }
 
         // 执行深度优先遍历，搜索可能的结果
-//        dfsPlus("", 0, 0, n, res);
+//        dfsAdd("", 0, 0, n, res);
 //        dfsMinus("", n, n, res);
         recursionMinus(n, n, "", res);
         return res;
     }
 
     public static void recursionMinus(int left, int right, String s, List<String> res) {
-        if(left == 0 && right == 0){
+        if (left == 0 && right == 0) {
             res.add(s);
-        }else{
-            if(left > 0){
+        } else {
+            if (left > 0) {
                 recursionMinus(left - 1, right, s + "(", res);
             }
 
-            if(right > left){
+            if (right > left) {
                 recursionMinus(left, right - 1, s + ")", res);
             }
         }
@@ -1562,7 +1577,7 @@ public class Shopee {
         }
         // 什么时候可以用右边？例如，(((((()，此时 left < right，
         // 不能用等号，因为只有先拼了左括号，才能拼上右括号
-        if (right > 0 && left < right) {
+        if (left < right) {
             // 拼接上一个右括号，并且剩余的右括号个数减 1
             dfsMinus(curStr + ")", left, right - 1, res);
         }
@@ -1575,7 +1590,7 @@ public class Shopee {
      * @param n         左括号、右括号一共用几个
      * @param res       结果集
      */
-    public static void dfsPlus(String curStr, int left, int right, int n, List<String> res) {
+    public static void dfsAdd(String curStr, int left, int right, int n, List<String> res) {
         // 因为是递归函数，所以先写递归终止条件
         if (left == n && right == n) {
             res.add(curStr);
@@ -1584,13 +1599,13 @@ public class Shopee {
         // 如果左括号还没凑够，继续凑
         if (left < n) {
             // 拼接上一个左括号，并且剩余的左括号个数减 1
-            dfsPlus(curStr + "(", left + 1, right, n, res);
+            dfsAdd(curStr + "(", left + 1, right, n, res);
         }
         // 什么时候可以用右边？例如，(((((()，此时 left > right，
         // 不能用等号，因为只有先拼了左括号，才能拼上右括号
-        if (right < n && left > right) {
+        if (left > right) {
             // 拼接上一个右括号，并且剩余的右括号个数减 1
-            dfsPlus(curStr + ")", left, right + 1, n, res);
+            dfsAdd(curStr + ")", left, right + 1, n, res);
         }
     }
 
