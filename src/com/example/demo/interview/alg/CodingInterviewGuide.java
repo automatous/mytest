@@ -2518,12 +2518,51 @@ public class CodingInterviewGuide {
         }
     }
 
+    // ==========================================
+    static int climbStairs(int n, int m) {
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (i - j >= 0) {
+                    dp[i] += dp[i - j];
+                }
+            }
+            System.out.println(Arrays.toString(dp));
+        }
+
+        return dp[n];
+    }
+
+    static int climbStairsError(int n, int m) {
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        for (int j = 1; j <= m; j++) {
+            for (int i = 1; i <= n; i++) {
+                if (i - j >= 0) {
+                    dp[i] += dp[i - j];
+                }
+            }
+            System.out.println(Arrays.toString(dp));
+        }
+
+        return dp[n];
+    }
+
+    @Test
+    public void testClimbStairs() {
+        int n = 10, m = 5;
+        System.out.println(climbStairs(n, m));
+        System.out.println(climbStairsError(n, m));
+    }
+
     // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ =================== dp =================== \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
 
     // /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ =================== dfs/bfs =================== /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\
 
     static class NestedInteger {
+        // TODO 改成 val 与 list 互斥的数据结构
         Integer val;
         List<NestedInteger> list;
 
