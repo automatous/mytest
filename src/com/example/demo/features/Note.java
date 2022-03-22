@@ -88,7 +88,7 @@ public class Note {
              B.HashTable存储方式都是链表+数组，数组里面放的是当前hash的第一个数据，链表里面放的是hash冲突的数据 ，ConcurrentHashMap是数组+链表+红黑树
              C.线程安全的保证： HashTable是在每一个操作方法上都加上synchronized关键字来达 到线程安全的目的，而ConcurrentHashMap则是通过CAS算法      （CompareAndSwap）来保证线程安全
                         
-            ③ ConcurrentHashMap 放弃了分段锁，而使用了Nodo锁，减低了锁的粒度，提高了性能，并使用CAS操作来保证Node操作的原子性。但是ConcurrentHashMap的一些操作使用了synchronized锁，而不是ReentrantLock,虽然说jdk8的synchronized的性能进行了优化，但是我觉得还是使用ReentrantLock锁能更多的提高性能
+            ③ ConcurrentHashMap 放弃了分段锁，而使用了Node锁，减低了锁的粒度，提高了性能，并使用CAS操作来保证Node操作的原子性。但是ConcurrentHashMap的一些操作使用了synchronized锁，而不是ReentrantLock,虽然说jdk8的synchronized的性能进行了优化，但是我觉得还是使用ReentrantLock锁能更多的提高性能
                         
             ④ 顺序的 Map 实现类:LinkedHashMap,TreeMap
              LinkedHashMap 是基于元素进入集合的顺序或者被访问的先后顺序排序，TreeMap 则是基于元素的固有顺序 (由Comparator 或者 Comparable 确定)
