@@ -11,9 +11,11 @@ public class NSumTargetDistinctTest {
 
     @Test
     public void testNSum() {
-        int[] nums = {-1, 0, 1, 2, -1, 4};
+//        int[] nums = {-1, 0, 1, 2, -1, 4};
+        int[] nums = {1, 1, 1, 2, 2, 3, 3};
         for (int i = 2; i <= 4; i++) {
-            List<List<Integer>> lists = nSumDistinctTarget(nums, i, 0);
+//            List<List<Integer>> lists = nSumDistinctTarget(nums, i, 0);
+            List<List<Integer>> lists = nSumDistinctTarget(nums, i, 4);
             System.out.println(lists);
             System.out.println();
         }

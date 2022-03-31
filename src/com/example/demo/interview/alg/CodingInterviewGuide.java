@@ -139,6 +139,40 @@ public class CodingInterviewGuide {
 
     // =====================================================================================================================
 
+    public static LinkedNode reverseFromTail2Head(LinkedNode head) {
+        LinkedNode pre = null;
+        LinkedNode cur = head;
+        while (cur != null) {
+            LinkedNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+
+    @Test
+    public void testReverseFromTail2Head() {
+        List<LinkedNode> list = new LinkedList<>();
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6, new LinkedNode(7, new LinkedNode(8)))))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6, new LinkedNode(7))))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5, new LinkedNode(6)))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4, new LinkedNode(5))))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3, new LinkedNode(4)))));
+        list.add(new LinkedNode(1, new LinkedNode(2, new LinkedNode(3))));
+        list.add(new LinkedNode(1, new LinkedNode(2)));
+        list.add(new LinkedNode(1));
+        list.add(null);
+
+        for (LinkedNode head : list) {
+            // debug查看, 避免死循环
+            LinkedNode newHead = reverseFromTail2Head(head);
+            System.out.println(newHead);
+        }
+    }
+
+    // ==============================================================================
+
     public static LinkedNode reverseFromTail2HeadWithDummy(LinkedNode head) {
         LinkedNode dummy = new LinkedNode(-1);
         LinkedNode cur = head;
@@ -165,6 +199,7 @@ public class CodingInterviewGuide {
         list.add(null);
 
         for (LinkedNode head : list) {
+            // debug查看, 避免死循环
             LinkedNode newHead = reverseFromTail2HeadWithDummy(head);
             System.out.println(newHead);
         }
@@ -1229,7 +1264,7 @@ public class CodingInterviewGuide {
     }
 
 
-    public static class LinkedNode {
+    private static class LinkedNode {
         int val;
         LinkedNode next;
 
