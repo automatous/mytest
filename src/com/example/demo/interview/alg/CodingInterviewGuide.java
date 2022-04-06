@@ -1825,6 +1825,35 @@ public class CodingInterviewGuide {
         return a;
     }
 
+
+    public static int primes(int n) {
+        boolean[] ba = new boolean[n + 1];
+        Arrays.fill(ba, true);
+        for (int i = 2; i * i <= n; i++) {
+            if (ba[i]) {
+                for (int j = i * i; j <= n; j += i) {
+                    ba[j] = false;
+                }
+            }
+        }
+
+        int cnt = 0;
+        for (int i = 2; i <= n; i++) {
+            if (ba[i]) {
+//                System.out.println(i);
+                cnt++;
+            }
+        }
+
+        return cnt;
+    }
+
+
+    @Test
+    public void testPrimes() {
+        int primes = primes(100);
+        System.out.println(primes);
+    }
     // ==========================================================================
     public static int addRecursive(int a, int b) {
         return a == 0 ? b : addRecursive((a & b) << 1, a ^ b);
